@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "steam-condenser", "src\steam-condenser.vcproj", "{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcproj", "{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB} = {0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug_LIB = Debug_LIB
+		Release_LIB = Release_LIB
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Debug_LIB.ActiveCfg = Debug_LIB|Win32
+		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Debug_LIB.Build.0 = Debug_LIB|Win32
+		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Release_LIB.ActiveCfg = Release_LIB|Win32
+		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Release_LIB.Build.0 = Release_LIB|Win32
+		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Debug_LIB.ActiveCfg = Debug_LIB|Win32
+		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Debug_LIB.Build.0 = Debug_LIB|Win32
+		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Release_LIB.ActiveCfg = Release_LIB|Win32
+		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Release_LIB.Build.0 = Release_LIB|Win32
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal
