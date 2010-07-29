@@ -7,9 +7,9 @@
  * Source code is part of the steam-condenser project
  * http://koraktor.github.com/steam-condenser
  ******************************************************************************/
-#include "../include/steam-condenser.h"
+#include "steam-condenser.h"
 
-extern int sc_init()
+int sc_init()
 {
 	int ret = 0;
 #ifdef WIN32
@@ -24,7 +24,7 @@ extern int sc_init()
 	return ret;
 }
 
-extern void sc_end()
+void sc_end()
 {
 #ifdef WIN32
 	WSACleanup();
@@ -32,12 +32,55 @@ extern void sc_end()
 }
 
 /**
+ * Valve stores everything in little endian except the serverlist from master server.
+ */
+byte readByte(char *buffer, int *position)
+{
+	return buffer[*position++];
+}
+
+short readShort(char *buffer, int *position)
+{
+	return readByte(buffer, position) | (readByte(buffer, position) << 8);
+}
+
+long readLong(char *buffer, int *position)
+{
+	return readShort(buffer, position) | (readShort(buffer, position) << 16);
+}
+
+float readFloat(char *buffer, int *position)
+{
+	return 1.0;
+}
+
+long long readLongLong(char *buffer, int *position)
+{
+	return readLong(buffer, position) | (readLong(buffer, position) << 32);
+}
+
+char* readString(char *buffer, int *position, int continueFrom)
+{
+	int maxLen = STEAM_PACKET_SIZE - *position;
+	char *ret = calloc(sizeof(char), maxLen);
+	int i = 0;
+	if (continueFrom) i = continueFrom;
+	while (buffer[*position] != '\0' && (i-continueFrom) <= maxLen) {
+		ret[i++] = buffer[*position++];
+	}
+	realloc(ret, strlen(ret)+1);
+	return ret;
+}
+
+
+
+/**
  * Windows implementations of inet_ntop and inet_pton
  * original source: http://www.mail-archive.com/users@ipv6.org/msg02107.html
  */
 #ifdef WIN32
 //#if NTDDI_VERSION < NTDDI_LONGHORN
-extern const char* inet_ntop(int af, const void *src, char *dst, socklen_t cnt)
+const char* inet_ntop(int af, const void *src, char *dst, socklen_t cnt)
 {
 	if (af == AF_INET) {
 		struct sockaddr_in in;
@@ -57,7 +100,7 @@ extern const char* inet_ntop(int af, const void *src, char *dst, socklen_t cnt)
 	return NULL;
 }
 
-extern int inet_pton(int af, const char *src, void *dst)
+int inet_pton(int af, const char *src, void *dst)
 {
 	struct addrinfo hints, *res, *ressave;
 	memset(&hints, 0, sizeof(struct addrinfo));

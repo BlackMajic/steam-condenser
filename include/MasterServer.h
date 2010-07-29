@@ -28,7 +28,13 @@
 #define A2M_GET_SERVERS_BATCH2	0x31
 #define M2A_SERVER_BATCH_HEADER	0x66
 
-extern int getMasterServer(const char *address);
-extern struct addrinfo* getServers(int socket, const char region, const char *filter);
+struct MasterServer {
+	int socket;
+	struct addrinfo *servers;
+};
+
+extern struct MasterServer* getMasterServer(const char *address);
+extern void getServers(struct MasterServer *master, const char region, const char *filter);
+extern void freeMasterServer(struct MasterServer *master);
 
 #endif

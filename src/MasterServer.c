@@ -7,17 +7,17 @@
  * Source code is part of the steam-condenser project
  * http://koraktor.github.com/steam-condenser
  ******************************************************************************/
-#include "../include/MasterServer.h"
-#include "../include/steam-condenser.h"
+#include "MasterServer.h"
+#include "steam-condenser.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 // Connects to, and returns an open socket to an available master server
-extern int getMasterServer(const char *masterServer)
+extern struct MasterServer* getMasterServer(const char *address)
 {
-	int sockout;
-	struct addrinfo hints, *servers, *master;
-	char *serv = strdup(masterServer);
+	struct MasterServer *master = calloc(sizeof(struct MasterServer), 1);
+	struct addrinfo hints, *servers, *server;
+	char *serv = strdup(address);
 	char *addr = strtok(serv, ":");
 	char *port = strtok(NULL, ":");
 	
@@ -31,27 +31,27 @@ extern int getMasterServer(const char *masterServer)
 		exit(2);
 	}
 	
-	for (master = servers; master != NULL; master = master->ai_next) {
-		sockout = socket(master->ai_family, master->ai_socktype, master->ai_protocol);
-		if (sockout == -1) {
+	for (server = servers; server != NULL; server = server->ai_next) {
+		master->socket = socket(server->ai_family, server->ai_socktype, server->ai_protocol);
+		if (master->socket == -1) {
 			perror("Sockout Error");
 		} else {
-			if (connect(sockout, master->ai_addr, master->ai_addrlen) == -1) {
+			if (connect(master->socket, server->ai_addr, server->ai_addrlen) == -1) {
 				perror("Connect Error");
 			} else {
 				break;
 			}
 		}
 	}
-	if (sockout == -1) exit(3);
+	if (master->socket == -1) exit(3);
 	freeaddrinfo(servers);
 	free(serv);
 	
-	return sockout;
+	return master;
 }
 
 // IPv6 Incompatible
-extern struct addrinfo* getServers(int socket, const char region, const char *filter)
+extern void getServers(struct MasterServer *master, const char region, const char *filter)
 {
 	int i, sent, recvd, addressLen;
 	int filterLen = strlen(filter) + 1;
@@ -68,11 +68,11 @@ extern struct addrinfo* getServers(int socket, const char region, const char *fi
 		message[1] = region;
 		memcpy(&message[2], address, addressLen);
 		memcpy(&message[2 + addressLen], filter, filterLen);
-		if (sent = send(socket, message, 2 + addressLen + filterLen, 0) < 2 + addressLen + filterLen) {
+		if (sent = send(master->socket, message, 2 + addressLen + filterLen, 0) < 2 + addressLen + filterLen) {
 			fprintf(stderr, "Unable to send all data");
 		}
 		
-		recvd = recv(socket, buffer, 1392, 0);
+		recvd = recv(master->socket, buffer, 1392, 0);
 		
 		for (i = 0; i < recvd; i += 6) {
 			int len, port;
@@ -112,5 +112,22 @@ extern struct addrinfo* getServers(int socket, const char region, const char *fi
 	free(buffer);
 	free(message);
 	
-	return ret;
+	master->servers = ret;
+}
+
+extern void freeMasterServer(struct MasterServer *master)
+{
+	struct addrinfo *server;
+	//freeaddrinfo(master->servers);
+	server = master->servers;
+	while (server != NULL) {
+		struct addrinfo *s = server->ai_next;
+		free(server->ai_addr);
+		free(server);
+		server = s;
+	}
+	master->servers = NULL;
+	shutdown(master->socket, 2);
+	master->socket = NULL;
+	free(master);
 }
