@@ -7,43 +7,38 @@
  * Source code is part of the steam-condenser project
  * http://koraktor.github.com/steam-condenser
  ******************************************************************************/
-#include "../include/steam-condenser.h"
-
+#include "steam-condenser.h"
 #include <stdio.h>
 #include <string.h>
 
 int main(int argc, char *argv[])
 {
-	int masterSocket;
-	struct addrinfo *servers;
+	struct MasterServer *master;
+	struct addrinfo *server;
 	sc_init();
 	
-	masterSocket = getMasterServer(SOURCE_MASTER);
-	servers = getServers(masterSocket, REGION_US_EAST, "\\type\\d\\secure\\1\\linux\\1\\empty\\1\\full\\1\\napp\\500");
+	master = getMasterServer(SOURCE_MASTER);
+	getServers(master, REGION_US_EAST, "\\type\\d\\secure\\1\\linux\\1\\empty\\1\\full\\1\\napp\\500");
+	server = master->servers;
 	
-	while (servers != NULL) {
+	while (server != NULL) {
 		char *str = malloc(INET_ADDRSTRLEN);
-		switch(servers->ai_family) {
+		switch(server->ai_family) {
 			case AF_INET:
-				inet_ntop(AF_INET, &((struct sockaddr_in*)servers->ai_addr)->sin_addr, str, INET_ADDRSTRLEN);
+				inet_ntop(AF_INET, &((struct sockaddr_in*)server->ai_addr)->sin_addr, str, INET_ADDRSTRLEN);
 			break;
 			case AF_INET6:
-				inet_ntop(AF_INET6, &((struct sockaddr_in6*)servers->ai_addr)->sin6_addr, str, INET6_ADDRSTRLEN);
+				inet_ntop(AF_INET6, &((struct sockaddr_in6*)server->ai_addr)->sin6_addr, str, INET6_ADDRSTRLEN);
 			break;
 			default:
 				strncpy(str, "Unknown AF", INET_ADDRSTRLEN);
 		}
 		printf("%s\n", str);
-		servers = servers->ai_next;
+		server = server->ai_next;
 	}
 	
 	// do some cleanup...
-	freeaddrinfo(servers);
-	#ifdef WIN32
-		closesocket(masterSocket);
-	#else
-		close(masterSocket);
-	#endif
+	freeMasterServer(master);
 	sc_end();
 	system("pause");
 	return 0;

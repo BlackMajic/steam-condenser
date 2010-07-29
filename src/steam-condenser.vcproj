@@ -20,6 +20,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="$(SolutionDir)include\"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -32,7 +33,9 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)$(ProjectName)_d.lib"/>
+				AdditionalDependencies="libbz2.lib"
+				OutputFile="$(OutDir)$(ProjectName)_d.lib"
+				AdditionalLibraryDirectories="$(SolutionDir)lib\"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -184,6 +187,9 @@
 				Name="steam"
 				Filter="">
 				<File
+					RelativePath=".\GameServer.c">
+				</File>
+				<File
 					RelativePath=".\MasterServer.c">
 				</File>
 			</Filter>
@@ -199,14 +205,20 @@
 				Name="steam"
 				Filter="">
 				<File
+					RelativePath="..\include\GameServer.h">
+				</File>
+				<File
 					RelativePath="..\include\MasterServer.h">
 				</File>
 			</Filter>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
-			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
+			<Filter
+				Name="Resource Files"
+				Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
+				UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
+				<File
+					RelativePath="..\include\bzlib.h">
+				</File>
+			</Filter>
 		</Filter>
 	</Files>
 	<Globals>

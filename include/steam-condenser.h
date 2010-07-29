@@ -10,15 +10,12 @@
 #ifndef STEAM_CONDENSER_H
 #define STEAM_CONDENSER_H
 
+#define DEBUG // change to NDEBUG on release
+
 #ifdef __cplusplus
 typedef enum { false, true } bool;
 extern "C" {
 #endif
-
-#include <assert.h>
-#include <stdio.h>
-
-#define DEBUG // change to NDEBUG on release
 
 #ifdef WIN32
 	#define WIN32_LEAN_AND_MEAN
@@ -36,17 +33,28 @@ extern "C" {
 	#include <netdb.h>
 #endif
 
+#include <assert.h>
+#include <stdio.h>
+#include <bzlib.h>
+
+typedef char byte;
+
 /*******************************************************************************
  * Generic Function Declarations
  ******************************************************************************/
 extern int sc_init();
 extern void sc_end();
-
+extern byte readByte(char *buffer, int *position);
+extern short readShort(char *buffer, int *position);
+extern long readLong(char *buffer, int *position);
+extern float readFloat(char *buffer, int *position);
+extern long long readLongLong(char *buffer, int *position);
+extern char* readString(char *buffer, int *position, int continueFrom);
 /*******************************************************************************
  * Custom Includes
  ******************************************************************************/
 #include "MasterServer.h"
-
+#include "GameServer.h"
 
 #ifdef __cplusplus
 }
