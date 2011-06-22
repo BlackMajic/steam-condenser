@@ -11,10 +11,12 @@
 #include "steam-condenser.h"
 
 #include <time.h>
+#include <stdlib.h>
+#include <stdio.h>
 
-extern struct GameServer* getGameServerFromString(char *address)
+sc_GameServer* SC_API(sc_getGameServerFromString)(char *address)
 {
-	struct GameServer *ret = calloc(sizeof(struct GameServer), 1);
+	sc_GameServer *ret = calloc(sizeof(sc_GameServer), 1);
 	struct addrinfo hints, *servers, *server;
 	char *serv = strdup(address);
 	char *addr = strtok(serv, ":");
@@ -51,9 +53,9 @@ extern struct GameServer* getGameServerFromString(char *address)
 	return ret;
 }
 
-extern struct GameServer* getGameServerFromAddress(struct addrinfo *address)
+sc_GameServer* SC_API(sc_getGameServerFromAddress)(struct addrinfo *address)
 {
-	struct GameServer *ret = calloc(sizeof(struct GameServer), 1);
+	sc_GameServer *ret = calloc(sizeof(sc_GameServer), 1);
 	struct addrinfo *server;
 	for (server = address; server != NULL; server = server->ai_next) {
 		ret->socketUDP = socket(server->ai_family, server->ai_socktype, server->ai_protocol);
@@ -74,7 +76,7 @@ extern struct GameServer* getGameServerFromAddress(struct addrinfo *address)
 	return ret;
 }
 
-extern void getPing(struct GameServer *server)
+void getPing(sc_GameServer *server)
 {
 	clock_t starttime = clock() * CLOCKS_PER_SEC;
 	int sent, recvd;
@@ -93,7 +95,7 @@ extern void getPing(struct GameServer *server)
 	//return -1;
 }
 
-extern void getServerInfo(struct GameServer *server)
+void getServerInfo(sc_GameServer *server)
 {
 	//A2A_INFO;
 	//char *message = malloc(size);
@@ -106,49 +108,49 @@ extern void getServerInfo(struct GameServer *server)
 	
 	recvd = recv(server->socketUDP, buffer, STEAM_PACKET_SIZE, 0);
 	
-	if (readLong(buffer, &pos) == -2) { // split packet
+	if (sc_readLong(buffer, &pos) == -2) { // split packet
 		do {
 		} while (0);
 	}
 }
 
-extern void getChallenge(struct GameServer *server)
+void getChallenge(sc_GameServer *server)
 {
 	
 }
 
-extern void getPlayers(struct GameServer *server)
+void getPlayers(sc_GameServer *server)
 {
 	
 }
 
-extern void getRules(struct GameServer *server)
+void getRules(sc_GameServer *server)
 {
 	
 }
 
-extern void updatePlayers(struct GameServer *server)
+void updatePlayers(sc_GameServer *server)
 {
 	
 }
 
-extern void updateRules(struct GameServer *server)
+void updateRules(sc_GameServer *server)
 {
 	
 }
 
 
-extern void freePlayers(struct Players *players)
+void freePlayers(sc_Players *players)
 {
 	
 }
 
-extern void freeRules(struct Rules *players)
+void freeRules(sc_Rules *players)
 {
 	
 }
 
-extern void freeGameServer(struct GameServer *server)
+void freeGameServer(sc_GameServer *server)
 {
 	
 }

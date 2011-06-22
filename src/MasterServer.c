@@ -13,45 +13,15 @@
 #include <stdlib.h>
 
 // Connects to, and returns an open socket to an available master server
-extern struct MasterServer* getMasterServer(const char *address)
+sc_MasterServer* SC_API(sc_getMasterServer)(const char *address)
 {
-	struct MasterServer *master = calloc(sizeof(struct MasterServer), 1);
-	struct addrinfo hints, *servers, *server;
-	char *serv = strdup(address);
-	char *addr = strtok(serv, ":");
-	char *port = strtok(NULL, ":");
-	
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_DGRAM;
-	hints.ai_flags = AI_PASSIVE;
-	
-	if (getaddrinfo(addr, port, &hints, &servers) != 0) {
-		perror("getaddrinfo");
-		exit(2);
-	}
-	
-	for (server = servers; server != NULL; server = server->ai_next) {
-		master->socket = socket(server->ai_family, server->ai_socktype, server->ai_protocol);
-		if (master->socket == -1) {
-			perror("Sockout Error");
-		} else {
-			if (connect(master->socket, server->ai_addr, server->ai_addrlen) == -1) {
-				perror("Connect Error");
-			} else {
-				break;
-			}
-		}
-	}
-	if (master->socket == -1) exit(3);
-	freeaddrinfo(servers);
-	free(serv);
-	
+	sc_MasterServer *master = calloc(sizeof(sc_MasterServer), 1);
+	master->socket = sc_openSocketAddr(address, SOCK_DGRAM); // open socket() and connect()
 	return master;
 }
 
 // IPv6 Incompatible
-extern void getServers(struct MasterServer *master, const char region, const char *filter)
+void SC_API(sc_getServers)(sc_MasterServer *master, const byte region, const char *filter)
 {
 	int i, sent, recvd, addressLen;
 	int filterLen = strlen(filter) + 1;
@@ -115,19 +85,18 @@ extern void getServers(struct MasterServer *master, const char region, const cha
 	master->servers = ret;
 }
 
-extern void freeMasterServer(struct MasterServer *master)
+void SC_API(sc_freeMasterServer)(sc_MasterServer *master)
 {
-	struct addrinfo *server;
-	//freeaddrinfo(master->servers);
-	server = master->servers;
+	//struct addrinfo *server;
+	freeaddrinfo(master->servers);
+	/*server = master->servers;
 	while (server != NULL) {
 		struct addrinfo *s = server->ai_next;
 		free(server->ai_addr);
 		free(server);
 		server = s;
-	}
+	}*/
 	master->servers = NULL;
-	shutdown(master->socket, 2);
-	master->socket = NULL;
+	sc_closeSocket(&master->socket);
 	free(master);
 }

@@ -1,6 +1,5 @@
 bin
 build
-lib/*
-!lib/libbz2.lib
+lib
 *.ncb
 *.suo

@@ -9,6 +9,11 @@
  ******************************************************************************/
 #ifndef GAMESERVER_H
 #define GAMESERVER_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "steam-condenser.h"
 
 #define STEAM_PACKET_SIZE				1400
@@ -25,7 +30,7 @@
 // 0x45 byte [numrules]
 // then, numrules*(string string) [name value]
 
-struct SourceInfo {
+typedef struct sc_SourceInfo {
 	byte npVersion;
 	char *name;
 	char *map;
@@ -50,49 +55,53 @@ struct SourceInfo {
 	short appID;
 	char *unknown;
 	*/
-};
+} sc_SourceInfo;
 
-struct Rules {
+typedef struct sc_Rules {
 	char *name;
 	char *value;
-	struct Rules *next;
-};
+	struct sc_Rules *next;
+} sc_Rules;
 
-struct Players {
+typedef struct sc_Players {
 	byte index;
 	byte *name;
 	long kills;
 	float time;
-	struct Players *next;
-};
+	struct sc_Players *next;
+} sc_Players;
 
-struct GameServer {
+typedef struct sc_GameServer {
 	int socketUDP;
 	int socketTCP;
 	int ping;
 	long challenge;
 	struct addrinfo *addr;
-	struct SourceInfo *info;
+	struct sc_SourceInfo *info;
 	byte numRules;
-	struct Rules *rules;
+	struct sc_Rules *rules;
 	byte numPlayers;
-	struct Players *players;
-};
+	struct sc_Players *players;
+} sc_GameServer;
 
-extern struct GameServer* getGameServerFromString(char *address);
-extern struct GameServer* getGameServerFromAddress(struct addrinfo *address);
+SC_EXTERN sc_GameServer* SC_API(sc_getGameServerFromString)	(char *address);
+SC_EXTERN sc_GameServer* SC_API(sc_getGameServerFromAddress)(struct addrinfo *address);
 
-extern void getPing(struct GameServer *server);
-extern void getServerInfo(struct GameServer *server);
-extern void getChallenge(struct GameServer *server);
-extern void getPlayers(struct GameServer *server);
-extern void getRules(struct GameServer *server);
+SC_EXTERN void SC_API(sc_getPing)		(struct GameServer *server);
+SC_EXTERN void SC_API(sc_getServerInfo)	(struct GameServer *server);
+SC_EXTERN void SC_API(sc_getChallenge)	(struct GameServer *server);
+SC_EXTERN void SC_API(sc_getPlayers)	(struct GameServer *server);
+SC_EXTERN void SC_API(sc_getRules)		(struct GameServer *server);
 
-extern void updatePlayers(struct GameServer *server);
-extern void updateRules(struct GameServer *server);
+SC_EXTERN void SC_API(sc_updatePlayers)	(struct GameServer *server);
+SC_EXTERN void SC_API(sc_updateRules)	(struct GameServer *server);
 
-extern void freePlayers(struct Players *players);
-extern void freeRules(struct Rules *players);
-extern void freeGameServer(struct GameServer *server);
+SC_EXTERN void SC_API(sc_freePlayers)	(struct Players *players);
+SC_EXTERN void SC_API(sc_freeRules)		(struct Rules *players);
+SC_EXTERN void SC_API(sc_freeGameServer)(struct GameServer *server);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

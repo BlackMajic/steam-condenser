@@ -10,11 +10,16 @@
 #ifndef STEAM_CONDENSER_H
 #define STEAM_CONDENSER_H
 
-#define DEBUG // change to NDEBUG on release
-
 #ifdef __cplusplus
 typedef enum { false, true } bool;
 extern "C" {
+#endif
+
+#include <assert.h>
+typedef char byte;
+
+#ifndef SC_IMPORT
+	#define SC_EXPORT
 #endif
 
 #ifdef WIN32
@@ -23,33 +28,40 @@ extern "C" {
 	#define WINVER 0x0501
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
+	#ifdef SC_EXPORT
+		#define SC_EXTERN		extern
+		#define SC_API(func)	WINAPI func
+	#else
+		#define SC_EXTERN
+		#define SC_API(func)	(WINAPI * func)
+	#endif
 	//#if NTDDI_VERSION < NTDDI_LONGHORN
-		extern const char* inet_ntop(int af, const void *src, char *dst, socklen_t cnt);
-		extern int inet_pton(int af, const char *src, void *dst);
+		const char*	inet_ntop(int af, const void *src, char *dst, socklen_t cnt);
+		int			inet_pton(int af, const char *src, void *dst);
 	//#endif
 #else
 	#include <sys/types.h>
 	#include <sys/socket.h>
 	#include <netdb.h>
+	#define SC_EXTERN		extern
+	#define SC_API(func)	func
 #endif
-
-#include <assert.h>
-#include <stdio.h>
-#include <bzlib.h>
-
-typedef char byte;
 
 /*******************************************************************************
  * Generic Function Declarations
  ******************************************************************************/
-extern int sc_init();
-extern void sc_end();
-extern byte readByte(char *buffer, int *position);
-extern short readShort(char *buffer, int *position);
-extern long readLong(char *buffer, int *position);
-extern float readFloat(char *buffer, int *position);
-extern long long readLongLong(char *buffer, int *position);
-extern char* readString(char *buffer, int *position, int continueFrom);
+SC_EXTERN int	SC_API(sc_init)					();
+SC_EXTERN void	SC_API(sc_end)					();
+int				SC_API(sc_openSocketAddr)		(const char *address, int socktype);
+int				SC_API(sc_openSocketAddrPort)	(const char *address, const char *port, int socktype);
+void			SC_API(sc_closeSocket)			(int *socket);
+byte			SC_API(sc_readByte)				(char *buffer, int *position);
+short			SC_API(sc_readShort)			(char *buffer, int *position);
+long			SC_API(sc_readLong)				(char *buffer, int *position);
+float			SC_API(sc_readFloat)			(char *buffer, int *position);
+long long		SC_API(sc_readLongLong)			(char *buffer, int *position);
+char*			SC_API(sc_readString)			(char *buffer, int *position, int continueFrom);
+
 /*******************************************************************************
  * Custom Includes
  ******************************************************************************/

@@ -9,12 +9,14 @@
  ******************************************************************************/
 #include "steam-condenser.h"
 
-int sc_init()
+#include <stdlib.h>
+#include <stdio.h>
+
+int SC_API(sc_init)()
 {
 	int ret = 0;
 #ifdef WIN32
-	WSADATA wsaData;   // if this doesn't work
-	//WSAData wsaData; // then try this instead
+	struct WSAData wsaData;
 	
 	if (ret = WSAStartup(MAKEWORD(2,2), &wsaData)) {
 		fprintf(stderr, "WSAStartup failed.\n");
@@ -24,7 +26,72 @@ int sc_init()
 	return ret;
 }
 
-void sc_end()
+// seperate address into address:port, then pass along
+int SC_API(sc_openSocketAddr)(const char *address, int socktype)
+{
+	char *serv = strdup(address);
+	char *addr = strtok(serv, "[");
+	char *port = "";
+	int sock = 0;
+	if (strcmp(addr, serv)) {
+		// IPv6 [::1]:0
+		addr = strtok(addr, "]");
+		port = strtok(NULL, ":");
+	} else {
+		// IPv4 or named 127.0.0.1:0 / localhost:0
+		addr = strtok(serv, ":");
+		port = strtok(NULL, ":");
+	}
+	sock = sc_openSocketAddrPort(addr, port, socktype);
+	free(serv);
+	return sock;
+}
+
+// connect() to address:port using socktype
+int SC_API(sc_openSocketAddrPort)(const char *address, const char *port, int socktype)
+{
+	int sock = 0;
+	struct addrinfo hints, *servers, *server;
+	
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family		= AF_UNSPEC;
+	hints.ai_socktype	= socktype;
+	hints.ai_flags		= AI_PASSIVE;
+	
+	if (getaddrinfo(address, port, &hints, &servers) != 0) {
+		perror("getaddrinfo");
+		exit(2);
+	}
+	
+	for (server = servers; server != NULL; server = server->ai_next) {
+		sock = socket(server->ai_family, server->ai_socktype, server->ai_protocol);
+		if (sock == -1) {
+			perror("Sockout Error");
+		} else {
+			if (connect(sock, server->ai_addr, server->ai_addrlen) == -1) {
+				perror("Connect Error");
+			} else {
+				break;
+			}
+		}
+	}
+	if (sock == -1) exit(3);
+	freeaddrinfo(servers);
+	return sock;
+}
+
+void SC_API(sc_closeSocket)(int *socket)
+{
+	shutdown(*socket, 2);
+#ifdef WIN32
+	closesocket(*socket);
+#else
+	close(*socket);
+#endif
+	socket = NULL;
+}
+
+void SC_API(sc_end)()
 {
 #ifdef WIN32
 	WSACleanup();
@@ -34,32 +101,32 @@ void sc_end()
 /**
  * Valve stores everything in little endian except the serverlist from master server.
  */
-byte readByte(char *buffer, int *position)
+byte SC_API(sc_readByte)(char *buffer, int *position)
 {
 	return buffer[*position++];
 }
 
-short readShort(char *buffer, int *position)
+short SC_API(sc_readShort)(char *buffer, int *position)
 {
-	return readByte(buffer, position) | (readByte(buffer, position) << 8);
+	return sc_readByte(buffer, position) | (sc_readByte(buffer, position) << 8);
 }
 
-long readLong(char *buffer, int *position)
+long SC_API(sc_readLong)(char *buffer, int *position)
 {
-	return readShort(buffer, position) | (readShort(buffer, position) << 16);
+	return sc_readShort(buffer, position) | (sc_readShort(buffer, position) << 16);
 }
 
-float readFloat(char *buffer, int *position)
+float SC_API(sc_readFloat)(char *buffer, int *position)
 {
 	return 1.0;
 }
 
-long long readLongLong(char *buffer, int *position)
+long long SC_API(sc_readLongLong)(char *buffer, int *position)
 {
-	return readLong(buffer, position) | (readLong(buffer, position) << 32);
+	return sc_readLong(buffer, position) | (sc_readLong(buffer, position) << 32);
 }
 
-char* readString(char *buffer, int *position, int continueFrom)
+char* SC_API(sc_readString)(char *buffer, int *position, int continueFrom)
 {
 	int maxLen = STEAM_PACKET_SIZE - *position;
 	char *ret = calloc(sizeof(char), maxLen);

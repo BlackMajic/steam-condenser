@@ -10,6 +10,12 @@
 #ifndef MASTERSERVER_H
 #define MASTERSERVER_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#include "steam-condenser.h"
+
 #define GOLDSRC_MASTER	"hl1master.steampowered.com:27010"
 #define SOURCE_MASTER	"hl2master.steampowered.com:27011"
 #define RDKF_MASTER		"67.132.200.140:27012"
@@ -28,13 +34,17 @@
 #define A2M_GET_SERVERS_BATCH2	0x31
 #define M2A_SERVER_BATCH_HEADER	0x66
 
-struct MasterServer {
+typedef struct {
 	int socket;
 	struct addrinfo *servers;
-};
+} sc_MasterServer;
 
-extern struct MasterServer* getMasterServer(const char *address);
-extern void getServers(struct MasterServer *master, const char region, const char *filter);
-extern void freeMasterServer(struct MasterServer *master);
+SC_EXTERN sc_MasterServer*	SC_API(sc_getMasterServer)	(const char *address);
+SC_EXTERN void				SC_API(sc_getServers)		(sc_MasterServer *master, const byte region, const char *filter);
+SC_EXTERN void				SC_API(sc_freeMasterServer)	(sc_MasterServer *master);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif

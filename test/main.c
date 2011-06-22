@@ -7,18 +7,22 @@
  * Source code is part of the steam-condenser project
  * http://koraktor.github.com/steam-condenser
  ******************************************************************************/
+
+#define DEBUG // change to NDEBUG on release
+
 #include "steam-condenser.h"
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 int main(int argc, char *argv[])
 {
-	struct MasterServer *master;
+	sc_MasterServer *master;
 	struct addrinfo *server;
 	sc_init();
 	
-	master = getMasterServer(SOURCE_MASTER);
-	getServers(master, REGION_US_EAST, "\\type\\d\\secure\\1\\linux\\1\\empty\\1\\full\\1\\napp\\500");
+	master = sc_getMasterServer(SOURCE_MASTER);
+	sc_getServers(master, REGION_US_EAST, "\\type\\d\\secure\\1\\linux\\1\\empty\\1\\full\\1\\napp\\500");
 	server = master->servers;
 	
 	while (server != NULL) {
@@ -38,7 +42,7 @@ int main(int argc, char *argv[])
 	}
 	
 	// do some cleanup...
-	freeMasterServer(master);
+	sc_freeMasterServer(master);
 	sc_end();
 	system("pause");
 	return 0;
