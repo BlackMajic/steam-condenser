@@ -17,29 +17,20 @@
 
 int main(int argc, char *argv[])
 {
-	sc_MasterServer *master;
-	struct addrinfo *server;
+	sc_MasterServer	*master = NULL;
+	sc_ServerList	*server = NULL;
+	unsigned int	i = 0;
 	sc_init();
 	
 	master = sc_getMasterServer(SOURCE_MASTER);
 	sc_getServers(master, REGION_US_EAST, "\\type\\d\\secure\\1\\linux\\1\\empty\\1\\full\\1\\napp\\500");
 	server = master->servers;
-	
 	while (server != NULL) {
-		char *str = malloc(INET_ADDRSTRLEN);
-		switch(server->ai_family) {
-			case AF_INET:
-				inet_ntop(AF_INET, &((struct sockaddr_in*)server->ai_addr)->sin_addr, str, INET_ADDRSTRLEN);
-			break;
-			case AF_INET6:
-				inet_ntop(AF_INET6, &((struct sockaddr_in6*)server->ai_addr)->sin6_addr, str, INET6_ADDRSTRLEN);
-			break;
-			default:
-				strncpy(str, "Unknown AF", INET_ADDRSTRLEN);
-		}
-		printf("%s\n", str);
-		server = server->ai_next;
+		printf("%s:%d\n", server->address, server->port);
+		server = server->next;
+		i++;
 	}
+	printf("Found %d Servers\n", i);
 	
 	// do some cleanup...
 	sc_freeMasterServer(master);

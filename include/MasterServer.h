@@ -34,9 +34,15 @@ extern "C" {
 #define A2M_GET_SERVERS_BATCH2	0x31
 #define M2A_SERVER_BATCH_HEADER	0x66
 
+typedef struct sc_ServerList {
+	char address[ADDRSTRLEN];
+	unsigned int port;
+	struct sc_ServerList *next;
+} sc_ServerList;
+
 typedef struct {
 	int socket;
-	struct addrinfo *servers;
+	sc_ServerList *servers;
 } sc_MasterServer;
 
 SC_EXTERN sc_MasterServer*	SC_API(sc_getMasterServer)	(const char *address);

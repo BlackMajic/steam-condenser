@@ -76,7 +76,7 @@ sc_GameServer* SC_API(sc_getGameServerFromAddress)(struct addrinfo *address)
 	return ret;
 }
 
-void getPing(sc_GameServer *server)
+void SC_API(getPing)(sc_GameServer *server)
 {
 	clock_t starttime = clock() * CLOCKS_PER_SEC;
 	int sent, recvd;
@@ -95,7 +95,7 @@ void getPing(sc_GameServer *server)
 	//return -1;
 }
 
-void getServerInfo(sc_GameServer *server)
+void SC_API(getServerInfo)(sc_GameServer *server)
 {
 	//A2A_INFO;
 	//char *message = malloc(size);
@@ -114,43 +114,43 @@ void getServerInfo(sc_GameServer *server)
 	}
 }
 
-void getChallenge(sc_GameServer *server)
+void SC_API(getChallenge)(sc_GameServer *server)
 {
 	
 }
 
-void getPlayers(sc_GameServer *server)
+void SC_API(getPlayers)(sc_GameServer *server)
 {
 	
 }
 
-void getRules(sc_GameServer *server)
+void SC_API(getRules)(sc_GameServer *server)
 {
 	
 }
 
-void updatePlayers(sc_GameServer *server)
+void SC_API(updatePlayers)(sc_GameServer *server)
 {
 	
 }
 
-void updateRules(sc_GameServer *server)
+void SC_API(updateRules)(sc_GameServer *server)
 {
 	
 }
 
 
-void freePlayers(sc_Players *players)
+void SC_API(freePlayers)(sc_Players *players)
 {
 	
 }
 
-void freeRules(sc_Rules *players)
+void SC_API(freeRules)(sc_Rules *players)
 {
 	
 }
 
-void freeGameServer(sc_GameServer *server)
+void SC_API(freeGameServer)(sc_GameServer *server)
 {
 	
 }

@@ -16,6 +16,8 @@ extern "C" {
 #endif
 
 #include <assert.h>
+#define ADDRSTRLEN			65		// enough space for ip and port
+#define STEAM_PACKET_SIZE	1400	// max packet size a server will respond with (plus headers)
 typedef char byte;
 
 #ifndef SC_IMPORT
@@ -24,8 +26,6 @@ typedef char byte;
 
 #ifdef WIN32
 	#define WIN32_LEAN_AND_MEAN
-	#define _WIN32_WINNT 0x0501
-	#define WINVER 0x0501
 	#include <winsock2.h>
 	#include <ws2tcpip.h>
 	#ifdef SC_EXPORT
@@ -35,10 +35,12 @@ typedef char byte;
 		#define SC_EXTERN
 		#define SC_API(func)	(WINAPI * func)
 	#endif
-	//#if NTDDI_VERSION < NTDDI_LONGHORN
+	#ifndef HAVE_INET_NTOP
 		const char*	inet_ntop(int af, const void *src, char *dst, socklen_t cnt);
+	#endif
+	#ifndef HAVE_INET_PTON
 		int			inet_pton(int af, const char *src, void *dst);
-	//#endif
+	#endif
 #else
 	#include <sys/types.h>
 	#include <sys/socket.h>

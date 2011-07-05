@@ -118,7 +118,7 @@ long SC_API(sc_readLong)(char *buffer, int *position)
 
 float SC_API(sc_readFloat)(char *buffer, int *position)
 {
-	return 1.0;
+	return sc_readLong(buffer, position);
 }
 
 long long SC_API(sc_readLongLong)(char *buffer, int *position)
@@ -146,7 +146,8 @@ char* SC_API(sc_readString)(char *buffer, int *position, int continueFrom)
  * original source: http://www.mail-archive.com/users@ipv6.org/msg02107.html
  */
 #ifdef WIN32
-//#if NTDDI_VERSION < NTDDI_LONGHORN
+#ifndef HAVE_INET_NTOP
+#define HAVE_INET_NTOP
 const char* inet_ntop(int af, const void *src, char *dst, socklen_t cnt)
 {
 	if (af == AF_INET) {
@@ -166,7 +167,10 @@ const char* inet_ntop(int af, const void *src, char *dst, socklen_t cnt)
 	}
 	return NULL;
 }
+#endif // HAVE_INET_NTOP
 
+#ifndef HAVE_INET_PTON
+#define HAVE_INET_PTON
 int inet_pton(int af, const char *src, void *dst)
 {
 	struct addrinfo hints, *res, *ressave;
@@ -188,5 +192,5 @@ int inet_pton(int af, const char *src, void *dst)
 	freeaddrinfo(ressave);
 	return 0;
 }
-//#endif // if NTDDI_VERSION < NTDDI_LONGHORN
+#endif // HAVE_INET_PTON
 #endif // ifdef WIN32
