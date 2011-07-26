@@ -11,7 +11,6 @@
 #define STEAM_CONDENSER_H
 
 #ifdef __cplusplus
-typedef enum { false, true } bool;
 extern "C" {
 #endif
 

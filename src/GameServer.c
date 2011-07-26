@@ -14,143 +14,124 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-sc_GameServer* SC_API(sc_getGameServerFromString)(char *address)
+sc_GameServer* SC_API(sc_getGameServerFromString)(const char *address)
 {
 	sc_GameServer *ret = calloc(sizeof(sc_GameServer), 1);
-	struct addrinfo hints, *servers, *server;
-	char *serv = strdup(address);
-	char *addr = strtok(serv, ":");
-	char *port = strtok(NULL, ":");
-	
-	memset(&hints, 0, sizeof(hints));
-	hints.ai_family = AF_UNSPEC;
-	hints.ai_socktype = SOCK_DGRAM;
-	hints.ai_flags = AI_PASSIVE;
-	
-	if (getaddrinfo(addr, port, &hints, &servers) != 0) {
-		perror("getaddrinfo");
-		exit(2);
-	}
-	
-	for (server = servers; server != NULL; server = server->ai_next) {
-		ret->socketUDP = socket(server->ai_family, server->ai_socktype, server->ai_protocol);
-		if (ret->socketUDP == -1) {
-			perror("Sockout Error");
-		} else {
-			if (connect(ret->socketUDP, server->ai_addr, server->ai_addrlen) == -1) {
-				perror("Connect Error");
-			} else {
-				memcpy(ret->addr, server, sizeof(struct addrinfo));
-				memcpy(ret->addr->ai_addr, server->ai_addr, sizeof(struct sockaddr));
-				break;
-			}
-		}
-	}
-	if (ret->socketUDP == -1) exit(3);
-	freeaddrinfo(servers);
-	free(serv);
-	
+	ret->socketUDP = sc_openSocketAddr(address, SOCK_DGRAM); // open socket() and connect()
 	return ret;
 }
 
-sc_GameServer* SC_API(sc_getGameServerFromAddress)(struct addrinfo *address)
+sc_GameServer* SC_API(sc_getGameServer)(const char *address, const char *port)
 {
 	sc_GameServer *ret = calloc(sizeof(sc_GameServer), 1);
-	struct addrinfo *server;
-	for (server = address; server != NULL; server = server->ai_next) {
-		ret->socketUDP = socket(server->ai_family, server->ai_socktype, server->ai_protocol);
-		if (ret->socketUDP == -1) {
-			perror("Sockout Error");
-		} else {
-			if (connect(ret->socketUDP, server->ai_addr, server->ai_addrlen) == -1) {
-				perror("Connect Error");
-			} else {
-				memcpy(ret->addr, server, sizeof(struct addrinfo));
-				memcpy(ret->addr->ai_addr, server->ai_addr, sizeof(struct sockaddr));
-				break;
-			}
-		}
-	}
-	if (ret->socketUDP == -1) exit(3);
-	
+	ret->socketUDP = sc_openSocketAddrPort(address, port, SOCK_DGRAM); // open socket() and connect()
 	return ret;
 }
 
-void SC_API(getPing)(sc_GameServer *server)
+int SC_API(sc_getPing)(sc_GameServer *server)
 {
 	clock_t starttime = clock() * CLOCKS_PER_SEC;
 	int sent, recvd;
-	char buffer[1400];
+	char buffer[STEAM_PACKET_SIZE] = "";
 	sent = recvd = 0;
-	if (sent = send(server->socketUDP, A2A_PING, strlen(A2A_PING), 0)) {
+	
+	if (sent = send(server->socketUDP, A2A_PING, A2A_PING_SIZE, 0) < A2A_PING_SIZE) {
 		fprintf(stderr, "Unable to send all data");
 	}
+	
 	recvd = recv(server->socketUDP, &buffer, STEAM_PACKET_SIZE, 0);
-	if (buffer[0] == '0x6A') { // 'j'
+	if (buffer[4] == 0x6A) { // 'j'
 		clock_t endtime = clock() * CLOCKS_PER_SEC;
-		server->ping = endtime-starttime;
-		//return server->ping;
+		server->ping = (endtime - starttime) / 1000;
+	} else {
+		server->ping = -1;
 	}
-	server->ping = -1;
-	//return -1;
+	return server->ping;
 }
 
-void SC_API(getServerInfo)(sc_GameServer *server)
+void SC_API(sc_getServerInfo)(sc_GameServer *server)
 {
-	//A2A_INFO;
-	//char *message = malloc(size);
+	BOOL done = FALSE;
 	BOOL isCompressed = FALSE;
-	int sent, recvd, pos;
-	char *buffer = calloc(STEAM_PACKET_SIZE, 1);
-	if (sent = send(server->socketUDP, A2S_INFO, strlen(A2S_INFO)+1, 0)) {
+	byte packetNum = 0;
+	byte packetTotal = 0;
+	short splitLength = 0;
+	int sent, recvd;
+	unsigned int pos = 0;
+	unsigned int finalSize = 0;
+	unsigned int crc32 = 0;
+	unsigned int requestID = 0;
+	unsigned char buffer[STEAM_PACKET_SIZE] = "";
+	sent = recvd = packetNum = packetTotal = 0;
+	
+	if (sent = send(server->socketUDP, A2S_INFO, A2S_INFO_SIZE, 0) < 0) {
 		fprintf(stderr, "Unable to send all data");
 	}
 	
-	recvd = recv(server->socketUDP, buffer, STEAM_PACKET_SIZE, 0);
+	// split this into another func or two
+	recvd = recv(server->socketUDP, &buffer, STEAM_PACKET_SIZE, 0);
 	
-	if (sc_readLong(buffer, &pos) == -2) { // split packet
+	if (sc_readLong(&buffer, &pos) == -2) {
+		byte numPackets = 1;
 		do {
-		} while (0);
+			requestID		= sc_readLong(&buffer, &pos);
+			isCompressed	= ((requestID & 0x80000000) != 0);
+			packetNum		= sc_readByte(&buffer, &pos) >> 4;
+			pos--;
+			packetTotal		= sc_readByte(&buffer, &pos) & 0xF;
+			// try to assemble all the packets
+			
+			// get the next packet
+			pos = 0;
+			numPackets++;
+			recvd = recv(server->socketUDP, &buffer, STEAM_PACKET_SIZE, 0);
+			if (recvd == -1 && errno == EAGAIN) {
+				done = TRUE;
+				fprintf(stderr, "Timeout receiving");
+			}
+		} while (!done && numPackets < packetTotal && sc_readLong(&buffer, &pos) == -2);
+	} else {
+		// not split or compressed
 	}
 }
 
-void SC_API(getChallenge)(sc_GameServer *server)
+void SC_API(sc_getChallenge)(sc_GameServer *server)
 {
 	
 }
 
-void SC_API(getPlayers)(sc_GameServer *server)
+void SC_API(sc_getPlayers)(sc_GameServer *server)
 {
 	
 }
 
-void SC_API(getRules)(sc_GameServer *server)
+void SC_API(sc_getRules)(sc_GameServer *server)
 {
 	
 }
 
-void SC_API(updatePlayers)(sc_GameServer *server)
+void SC_API(sc_updatePlayers)(sc_GameServer *server)
 {
 	
 }
 
-void SC_API(updateRules)(sc_GameServer *server)
+void SC_API(sc_updateRules)(sc_GameServer *server)
 {
 	
 }
 
 
-void SC_API(freePlayers)(sc_Players *players)
+void SC_API(sc_freePlayers)(sc_Players *players)
 {
 	
 }
 
-void SC_API(freeRules)(sc_Rules *players)
+void SC_API(sc_freeRules)(sc_Rules *players)
 {
 	
 }
 
-void SC_API(freeGameServer)(sc_GameServer *server)
+void SC_API(sc_freeGameServer)(sc_GameServer *server)
 {
 	
 }

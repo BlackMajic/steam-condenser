@@ -36,7 +36,7 @@ extern "C" {
 
 typedef struct sc_ServerList {
 	char address[ADDRSTRLEN];
-	unsigned int port;
+	char port[6];
 	struct sc_ServerList *next;
 } sc_ServerList;
 

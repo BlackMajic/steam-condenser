@@ -71,6 +71,15 @@ int SC_API(sc_openSocketAddrPort)(const char *address, const char *port, int soc
 			if (connect(sock, server->ai_addr, server->ai_addrlen) == -1) {
 				perror("Connect Error");
 			} else {
+				struct timeval timeout;
+				timeout.tv_sec = 10;
+				timeout.tv_usec = 0;
+				if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(long)*2) == -1) {
+					fprintf(stderr, "Failed to set timeout");
+				}
+				if(setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(long)*2) == -1) {
+					fprintf(stderr, "Failed to set timeout");
+				}
 				break;
 			}
 		}

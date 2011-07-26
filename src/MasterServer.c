@@ -23,14 +23,14 @@ sc_MasterServer* SC_API(sc_getMasterServer)(const char *address)
 // Not IPv6 Compatible on account of the master server's response
 void SC_API(sc_getServers)(sc_MasterServer *master, const byte region, const char *filter)
 {
-	unsigned int i, sent, recvd, addressLen;					// bytes sent/recvd, length of game server's address
-	unsigned int filterLen = strlen(filter) + 1;				// length of our filter + \0
+	unsigned int i, sent, recvd, addressLen;		// bytes sent/recvd, length of game server's address
+	unsigned int filterLen = strlen(filter) + 1;	// length of our filter + \0
 	sc_ServerList *last;
 	
 	char address[ADDRSTRLEN] = "0.0.0.0:0";
 	char addr2[ADDRSTRLEN] = "";
-	unsigned char *buffer  = calloc(sizeof(char), 1392);						// buffer for recvd data
-	char *message = calloc(sizeof(char), 2 + ADDRSTRLEN + filterLen);		// data to send
+	unsigned char buffer[STEAM_PACKET_SIZE] = "";						// buffer for recvd data
+	char *message = calloc(sizeof(char), 2 + ADDRSTRLEN + filterLen);	// data to send
 	
 	do {
 		/**
@@ -47,7 +47,7 @@ void SC_API(sc_getServers)(sc_MasterServer *master, const byte region, const cha
 			fprintf(stderr, "Unable to send all data");
 		}
 		
-		recvd = recv(master->socket, buffer, 1392, 0);
+		recvd = recv(master->socket, &buffer, 1392, 0);
 		
 		// Each server listing is 6 bytes. 4*octets, 2*port
 		for (i = 0; i < recvd; i += 6) {
@@ -63,20 +63,20 @@ void SC_API(sc_getServers)(sc_MasterServer *master, const byte region, const cha
 					master->servers = (sc_ServerList*)malloc(sizeof(sc_ServerList));
 					last			= master->servers;
 					strcpy(last->address, addr2);
-					last->port		= port;
+					sprintf(&last->port, "%d", port);
 					last->next		= NULL;
 					continue;
 				}
 				last->next		= (sc_ServerList*)malloc(sizeof(sc_ServerList));
 				last			= last->next;
 				strcpy(last->address, addr2);
-				last->port		= port;
+				sprintf(&last->port, "%d", port);
 				last->next		= NULL;
 			}
 		}
 		//printf("%s\n", address); // last address in packet
 	} while (strcmp(address, "0.0.0.0:0"));
-	free(buffer);
+	//free(buffer);
 	free(message);
 }
 

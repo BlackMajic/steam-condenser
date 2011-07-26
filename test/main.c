@@ -8,6 +8,10 @@
  * http://koraktor.github.com/steam-condenser
  ******************************************************************************/
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define DEBUG // change to NDEBUG on release
 
 #include "steam-condenser.h"
@@ -15,18 +19,45 @@
 #include <string.h>
 #include <stdlib.h>
 
+void printServers();
+void printServerInfo(const char *address);
+
 int main(int argc, char *argv[])
+{
+	char addr[ADDRSTRLEN] = "77.220.184.197:27356";
+	
+	sc_init();
+	
+	printServers();
+	system("pause");
+	
+	printServerInfo(addr);
+	system("pause");
+	
+	sc_end();
+	return 0;
+}
+
+void printServerInfo(const char *address)
+{
+	sc_GameServer *server = NULL;
+	server = sc_getGameServerFromString(address);
+	sc_getPing(server);
+	//sc_getServerInfo(server);
+	printf("Ping: %d\n", server->ping);
+}
+
+void printServers()
 {
 	sc_MasterServer	*master = NULL;
 	sc_ServerList	*server = NULL;
 	unsigned int	i = 0;
-	sc_init();
 	
 	master = sc_getMasterServer(SOURCE_MASTER);
 	sc_getServers(master, REGION_US_EAST, "\\type\\d\\secure\\1\\linux\\1\\empty\\1\\full\\1\\napp\\500");
 	server = master->servers;
 	while (server != NULL) {
-		printf("%s:%d\n", server->address, server->port);
+		printf("%s:%s\n", server->address, server->port);
 		server = server->next;
 		i++;
 	}
@@ -34,7 +65,8 @@ int main(int argc, char *argv[])
 	
 	// do some cleanup...
 	sc_freeMasterServer(master);
-	sc_end();
-	system("pause");
-	return 0;
 }
+
+#ifdef __cplusplus
+}
+#endif
