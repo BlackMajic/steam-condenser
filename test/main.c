@@ -6,23 +6,6 @@
  * 
  * Source code is part of the steam-condenser project
  * http://koraktor.github.com/steam-condenser
- Server type: 73
-Network Protocol Version: 48
-Server name: Castle Mortimus
-Map: op4_park
-Game Dir: gearbox
-Game Description: Opposing Force
-AppID: 50
-AppID2: 50
-Players: 0/16 (3 Bots)
-Dedicated: d
-OS: w
-Locked: 0
-Secure: 1
-Game Version: 1.1.2.1
-Port: 27015
-SteamID: 2694
-Tags:
  ******************************************************************************/
 
 #ifdef __cplusplus
