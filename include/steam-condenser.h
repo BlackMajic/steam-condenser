@@ -61,7 +61,7 @@ short			SC_API(sc_readShort)			(char *buffer, int *position);
 long			SC_API(sc_readLong)				(char *buffer, int *position);
 float			SC_API(sc_readFloat)			(char *buffer, int *position);
 long long		SC_API(sc_readLongLong)			(char *buffer, int *position);
-char*			SC_API(sc_readString)			(char *buffer, int *position, int continueFrom);
+void			SC_API(sc_readString)			(char *dest, char *buffer, int *position);
 
 /*******************************************************************************
  * Custom Includes

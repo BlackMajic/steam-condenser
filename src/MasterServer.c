@@ -21,11 +21,11 @@ sc_MasterServer* SC_API(sc_getMasterServer)(const char *address)
 }
 
 // Not IPv6 Compatible on account of the master server's response
-void SC_API(sc_getServers)(sc_MasterServer *master, const byte region, const char *filter)
+void SC_API(sc_getServers)(sc_MasterServer *master, sc_Region region, const char *filter)
 {
-	unsigned int i, sent, recvd, addressLen;		// bytes sent/recvd, length of game server's address
-	unsigned int filterLen = strlen(filter) + 1;	// length of our filter + \0
-	sc_ServerList *last;
+	unsigned int i=0, sent=0, recvd=0, addressLen=0;	// bytes sent/recvd, length of game server's address
+	unsigned int filterLen = strlen(filter) + 1;		// length of our filter + \0
+	sc_ServerList *last = NULL;
 	
 	char address[ADDRSTRLEN] = "0.0.0.0:0";
 	char addr2[ADDRSTRLEN] = "";

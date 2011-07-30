@@ -39,7 +39,6 @@ typedef struct sc_ModInfo {
 	char urlDL[128];
 	long version;
 	long dlSize;
-	byte nil;
 	byte svOnly;
 	byte clDLL;
 } sc_ModInfo;
@@ -65,7 +64,7 @@ typedef struct sc_ServerInfo {
 			short appID;
 			union {
 				struct {				// Standard Source server
-					char tag[128];		// if EDF & 0x20
+					char tags[128];		// if EDF & 0x20
 					char specName[64];	
 					long long steamID;	// if EDF & 0x10
 					short port;			// if EDF & 0x80
@@ -118,8 +117,10 @@ typedef struct sc_GameServer {
 SC_EXTERN sc_GameServer* SC_API(sc_getGameServerFromString)	(const char *address);
 SC_EXTERN sc_GameServer* SC_API(sc_getGameServer)			(const char *address, const char *port);
 
+char* SC_API(sc_combineSplitPackets)(int socket, char *buffer, int *pos, BOOL isGoldSrc);
+
 SC_EXTERN int  SC_API(sc_getPing)		(sc_GameServer *server);
-SC_EXTERN void SC_API(sc_getServerInfo)	(sc_GameServer *server);
+SC_EXTERN void SC_API(sc_getServerInfo)	(sc_GameServer *server, BOOL isGoldSrc);
 SC_EXTERN void SC_API(sc_getChallenge)	(sc_GameServer *server);
 SC_EXTERN void SC_API(sc_getPlayers)	(sc_GameServer *server);
 SC_EXTERN void SC_API(sc_getRules)		(sc_GameServer *server);

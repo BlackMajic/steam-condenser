@@ -20,12 +20,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)include\"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)include\&quot;;&quot;$(SolutionDir)lib\bzip2&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="5"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="$(IntDir)/$(ProjectName).pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
@@ -33,8 +34,9 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
+				AdditionalDependencies="libbz2.lib"
 				OutputFile="$(OutDir)$(ProjectName)_d.lib"
-				AdditionalLibraryDirectories="$(SolutionDir)lib\"/>
+				AdditionalLibraryDirectories="$(SolutionDir)lib\bzip2\Debug"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool

@@ -112,17 +112,17 @@ void SC_API(sc_end)()
  */
 byte SC_API(sc_readByte)(char *buffer, int *position)
 {
-	return buffer[*position++];
+	return buffer[(*position)++];
 }
 
 short SC_API(sc_readShort)(char *buffer, int *position)
 {
-	return sc_readByte(buffer, position) | (sc_readByte(buffer, position) << 8);
+	return sc_readByte(buffer, position) & 0xFF | ((sc_readByte(buffer, position) & 0xFF) << 8);
 }
 
 long SC_API(sc_readLong)(char *buffer, int *position)
 {
-	return sc_readShort(buffer, position) | (sc_readShort(buffer, position) << 16);
+	return sc_readShort(buffer, position) & 0xFFFF | (sc_readShort(buffer, position) & 0xFFFF << 16);
 }
 
 float SC_API(sc_readFloat)(char *buffer, int *position)
@@ -132,20 +132,17 @@ float SC_API(sc_readFloat)(char *buffer, int *position)
 
 long long SC_API(sc_readLongLong)(char *buffer, int *position)
 {
-	return sc_readLong(buffer, position) | (sc_readLong(buffer, position) << 32);
+	return sc_readLong(buffer, position) & 0xFFFFFFFF | (sc_readLong(buffer, position) & 0xFFFFFFFF << 32);
 }
 
-char* SC_API(sc_readString)(char *buffer, int *position, int continueFrom)
+void SC_API(sc_readString)(char *dest, char *buffer, int *position)
 {
-	int maxLen = STEAM_PACKET_SIZE - *position;
-	char *ret = calloc(sizeof(char), maxLen);
+	//strcpy(dest, buffer[*position]);
 	int i = 0;
-	if (continueFrom) i = continueFrom;
-	while (buffer[*position] != '\0' && (i-continueFrom) <= maxLen) {
-		ret[i++] = buffer[*position++];
+	while (buffer[*position] != 0x00) {
+		dest[i++] = buffer[(*position)++];
 	}
-	realloc(ret, strlen(ret)+1);
-	return ret;
+	(*position)++;
 }
 
 

@@ -6,6 +6,23 @@
  * 
  * Source code is part of the steam-condenser project
  * http://koraktor.github.com/steam-condenser
+ Server type: 73
+Network Protocol Version: 48
+Server name: Castle Mortimus
+Map: op4_park
+Game Dir: gearbox
+Game Description: Opposing Force
+AppID: 50
+AppID2: 50
+Players: 0/16 (3 Bots)
+Dedicated: d
+OS: w
+Locked: 0
+Secure: 1
+Game Version: 1.1.2.1
+Port: 27015
+SteamID: 2694
+Tags:
  ******************************************************************************/
 
 #ifdef __cplusplus
@@ -24,12 +41,11 @@ void printServerInfo(const char *address);
 
 int main(int argc, char *argv[])
 {
-	char addr[ADDRSTRLEN] = "77.220.184.197:27356";
+	char addr[ADDRSTRLEN] = "216.128.88.62:27021";
 	
 	sc_init();
 	
 	printServers();
-	system("pause");
 	
 	printServerInfo(addr);
 	system("pause");
@@ -43,8 +59,32 @@ void printServerInfo(const char *address)
 	sc_GameServer *server = NULL;
 	server = sc_getGameServerFromString(address);
 	sc_getPing(server);
-	//sc_getServerInfo(server);
-	printf("Ping: %d\n", server->ping);
+	sc_getServerInfo(server, FALSE);
+	printf("Server type: %d\n", server->info.type);
+	printf("Network Protocol Version: %d\n", server->info.npVersion);
+	printf("Server name: %s\n", server->info.hostname);
+	printf("Map: %s\n", server->info.map);
+	printf("Game Dir: %s\n", server->info.gameDir);
+	printf("Game Description: %s\n", server->info.gameDesc);
+	printf("AppID: %d\n", server->info.appID);
+	if (server->info.appID2)
+		printf("AppID2: %d\n", server->info.appID2);
+	printf("Players: %d/%d (%d Bots)\n", server->info.numPlayers, server->info.maxPlayers, server->info.numBots);
+	printf("Dedicated: %c\n", server->info.dedicated);
+	printf("OS: %c\n", server->info.os);
+	printf("Locked: %d\n", server->info.password);
+	printf("Secure: %d\n", server->info.secure);
+	printf("Game Version: %s\n", server->info.gameVersion);
+	if (server->info.port)
+		printf("Port: %d\n", server->info.port);
+	if (server->info.steamID)
+		printf("SteamID: %d\n", server->info.steamID);
+	if (server->info.specPort)
+		printf("Spectator Port and Name: %d - %s\n", server->info.specPort, server->info.specName);
+	if (server->info.tags)
+		printf("Tags: %s\n", server->info.tags);
+	printf("\n");
+	free(server);
 }
 
 void printServers()
@@ -54,14 +94,14 @@ void printServers()
 	unsigned int	i = 0;
 	
 	master = sc_getMasterServer(SOURCE_MASTER);
-	sc_getServers(master, REGION_US_EAST, "\\type\\d\\secure\\1\\linux\\1\\empty\\1\\full\\1\\napp\\500");
+	sc_getServers(master, REGION_US_EAST, "\\type\\d\\proxy\\1\\secure\\1\\linux\\1\\empty\\1\\full\\1\\napp\\500");
 	server = master->servers;
 	while (server != NULL) {
 		printf("%s:%s\n", server->address, server->port);
 		server = server->next;
 		i++;
 	}
-	printf("Found %d Servers\n", i);
+	printf("\nFound %d Servers\n\n", i);
 	
 	// do some cleanup...
 	sc_freeMasterServer(master);
