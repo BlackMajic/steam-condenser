@@ -24,13 +24,13 @@ void printServerInfo(const char *address);
 
 int main(int argc, char *argv[])
 {
-	char addr[ADDRSTRLEN] = "216.128.88.62:27021";
+	char addr[ADDRSTRLEN] = "64.31.29.60:27015";
 	
 	sc_init();
 	
 	printServers();
 	
-	printServerInfo(addr);
+	//printServerInfo(addr);
 	system("pause");
 	
 	sc_end();
@@ -40,7 +40,11 @@ int main(int argc, char *argv[])
 void printServerInfo(const char *address)
 {
 	sc_GameServer *server = NULL;
+	sc_Rules *rule = NULL;
+	sc_Players *player = NULL;
 	server = sc_getGameServerFromString(address);
+	rule = server->rules;
+	player = server->players;
 	sc_getPing(server);
 	sc_getServerInfo(server, FALSE);
 	printf("Server type: %d\n", server->info.type);
@@ -67,7 +71,26 @@ void printServerInfo(const char *address)
 	if (server->info.tags)
 		printf("Tags: %s\n", server->info.tags);
 	printf("\n");
-	free(server);
+	
+	sc_getRules(server, FALSE);
+	rule = server->rules;
+	printf("Rules:\n");
+	while (rule) {
+		if (rule->name == "" || rule->value == "")
+			printf("hi");
+		printf("%s = %s\n", rule->name, rule->value);
+		rule = rule->next;
+	}
+	
+	sc_getPlayers(server, FALSE);
+	player = server->players;
+	printf("Players:\n");
+	while (player) {
+		printf("%d - %s - %d - %02f\n", player->index, player->name, player->kills, player->time);
+		player = player->next;
+	}
+	
+	sc_freeGameServer(server);
 }
 
 void printServers()
@@ -77,11 +100,17 @@ void printServers()
 	unsigned int	i = 0;
 	
 	master = sc_getMasterServer(SOURCE_MASTER);
-	sc_getServers(master, REGION_US_EAST, "\\type\\d\\proxy\\1\\secure\\1\\linux\\1\\empty\\1\\full\\1\\napp\\500");
+	sc_getServers(master, REGION_US_EAST, "");
 	server = master->servers;
 	while (server != NULL) {
+		char addr[ADDRSTRLEN] = "";
+		strcat(addr, server->address);
+		strcat(addr, ":");
+		strcat(addr, server->port);
 		printf("%s:%s\n", server->address, server->port);
+		printServerInfo(addr);
 		server = server->next;
+		
 		i++;
 	}
 	printf("\nFound %d Servers\n\n", i);

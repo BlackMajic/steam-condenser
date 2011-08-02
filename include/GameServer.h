@@ -18,21 +18,24 @@ extern "C" {
 
 #define A2A_PING							"\xFF\xFF\xFF\xFF\x69"
 #define A2A_PING_SIZE						5
-// reply with 0x6A \0 (goldsrc), 0x6A '00000000000000' (source)
+#define A2A_PING_ACK						0x6A
+
 #define A2S_INFO							"\xFF\xFF\xFF\xFF\x54Source Engine Query"
 #define A2S_INFO_SIZE						25
-// reply varies
+
 #define A2S_SERVERQUERY_GETCHALLENGE		"\xFF\xFF\xFF\xFF\x57"
 #define A2S_SERVERQUERY_GETCHALLENGE_SIZE	5
-// reply with 0x41 long [challenge]
+#define A2S_SERVERQUERY_GETCHALLENGE_ACK	0x41
+
 #define A2S_PLAYER							"\xFF\xFF\xFF\xFF\x55" //+challenge
 #define A2S_PLAYER_SIZE						5
-// 0x44 byte [numplayers]
-// then, numplayers*(byte string long float) [index, name, kills, time]
+#define A2S_PLAYER_ACK						0x44
+// byte numplayers, numplayers*(byte index, string name, long kills, float time)
+
 #define A2S_RULES							"\xFF\xFF\xFF\xFF\x56" //+challenge
 #define A2S_RULES_SIZE						5
-// 0x45 byte [numrules]
-// then, numrules*(string string) [name value]
+#define A2S_RULES_ACK						0x45
+// byte numrules, numrules*(string name, string value)
 
 typedef struct sc_ModInfo {
 	char urlInfo[128];
@@ -66,7 +69,7 @@ typedef struct sc_ServerInfo {
 				struct {				// Standard Source server
 					char tags[128];		// if EDF & 0x20
 					char specName[64];	
-					long long steamID;	// if EDF & 0x10
+					unsigned long long steamID;	// if EDF & 0x10
 					short port;			// if EDF & 0x80
 					short specPort;		// if EDF & 0x40, followed by specName
 					short appID2;		// if EDF & 0x01 - appID again plus a bunch of NULL bytes
@@ -110,20 +113,20 @@ typedef struct sc_GameServer {
 	int				ping;
 	sc_Rules		*rules;
 	sc_Players		*players;
-	byte			numRules;
+	short			numRules;
 	byte			numPlayers;
 } sc_GameServer;
 
 SC_EXTERN sc_GameServer* SC_API(sc_getGameServerFromString)	(const char *address);
 SC_EXTERN sc_GameServer* SC_API(sc_getGameServer)			(const char *address, const char *port);
 
-char* SC_API(sc_combineSplitPackets)(int socket, char *buffer, int *pos, BOOL isGoldSrc);
+char* SC_API(sc_combineSplitPackets)(int socket, char *buffer, int *pos, int recvd, BOOL isGoldSrc);
 
 SC_EXTERN int  SC_API(sc_getPing)		(sc_GameServer *server);
 SC_EXTERN void SC_API(sc_getServerInfo)	(sc_GameServer *server, BOOL isGoldSrc);
 SC_EXTERN void SC_API(sc_getChallenge)	(sc_GameServer *server);
-SC_EXTERN void SC_API(sc_getPlayers)	(sc_GameServer *server);
-SC_EXTERN void SC_API(sc_getRules)		(sc_GameServer *server);
+SC_EXTERN void SC_API(sc_getPlayers)	(sc_GameServer *server, BOOL isGoldSrc);
+SC_EXTERN void SC_API(sc_getRules)		(sc_GameServer *server, BOOL isGoldSrc);
 
 SC_EXTERN void SC_API(sc_updatePlayers)	(sc_GameServer *server);
 SC_EXTERN void SC_API(sc_updateRules)	(sc_GameServer *server);

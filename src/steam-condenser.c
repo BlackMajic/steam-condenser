@@ -122,7 +122,7 @@ short SC_API(sc_readShort)(char *buffer, int *position)
 
 long SC_API(sc_readLong)(char *buffer, int *position)
 {
-	return sc_readShort(buffer, position) & 0xFFFF | (sc_readShort(buffer, position) & 0xFFFF << 16);
+	return sc_readShort(buffer, position) & 0xFFFF | ((sc_readShort(buffer, position) & 0xFFFF) << 16);
 }
 
 float SC_API(sc_readFloat)(char *buffer, int *position)
@@ -132,7 +132,7 @@ float SC_API(sc_readFloat)(char *buffer, int *position)
 
 long long SC_API(sc_readLongLong)(char *buffer, int *position)
 {
-	return sc_readLong(buffer, position) & 0xFFFFFFFF | (sc_readLong(buffer, position) & 0xFFFFFFFF << 32);
+	return sc_readLong(buffer, position) & 0xFFFFFFFF | ((sc_readLong(buffer, position) & 0xFFFFFFFF) << 32);
 }
 
 void SC_API(sc_readString)(char *dest, char *buffer, int *position)
@@ -142,6 +142,7 @@ void SC_API(sc_readString)(char *dest, char *buffer, int *position)
 	while (buffer[*position] != 0x00) {
 		dest[i++] = buffer[(*position)++];
 	}
+	dest[i] = 0x00;
 	(*position)++;
 }
 
