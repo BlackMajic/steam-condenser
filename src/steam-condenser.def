@@ -1,0 +1,23 @@
+LIBRARY			STEAM-CONDENSER
+DESCRIPTION		"steam-condenser: A library for querying GoldSrc, Source, Steam master servers, and the Steam Community"
+EXPORTS
+	sc_init
+	
+	sc_getMasterServer
+	sc_getServers
+	sc_freeMasterServer
+	
+	sc_getGameServerFromString
+	sc_getGameServer
+	sc_getPing
+	sc_getServerInfo
+	sc_getChallenge
+	sc_getPlayers
+	sc_getRules
+	sc_updatePlayers
+	sc_updateRules
+	sc_freePlayers
+	sc_freeRules
+	sc_freeGameServer
+	
+	sc_end

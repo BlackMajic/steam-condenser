@@ -14,29 +14,31 @@
 		<Configuration
 			Name="Debug_LIB|Win32"
 			OutputDirectory="$(SolutionDir)lib\"
-			IntermediateDirectory="$(SolutionDir)build\$(ProjectName)\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)build\$(ProjectName)\$(ConfigurationName)\"
 			ConfigurationType="4"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)include\&quot;;&quot;$(SolutionDir)lib\bzip2&quot;"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)include\&quot;;&quot;$(SolutionDir)lib\bzip2\&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
-				ProgramDataBaseFileName="$(IntDir)/$(ProjectName).pdb"
+				ObjectFile="$(IntDir)"
+				ProgramDataBaseFileName="$(IntDir)"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="4"/>
+				DebugInformationFormat="4"
+				CompileAs="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="libbz2.lib"
-				OutputFile="$(OutDir)$(ProjectName)_d.lib"
-				AdditionalLibraryDirectories="$(SolutionDir)lib\bzip2\Debug"/>
+				AdditionalDependencies="libbz2_dl.lib ws2_32.lib"
+				OutputFile="$(OutDir)$(ProjectName)_dl.lib"
+				AdditionalLibraryDirectories="&quot;$(SolutionDir)lib\&quot;"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -64,17 +66,22 @@
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)include\&quot;;&quot;$(SolutionDir)lib\bzip2\&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
-				RuntimeLibrary="4"
+				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="$(OutDir)$(TargetName).pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="3"/>
+				DebugInformationFormat="3"
+				CompileAs="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)$(ProjectName).lib"/>
+				AdditionalDependencies="libbz2.lib ws2_32.lib"
+				OutputFile="$(OutDir)$(ProjectName).lib"
+				AdditionalLibraryDirectories="$(SolutionDir)lib\"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -96,26 +103,33 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_DLL|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="4"
+			OutputDirectory="$(SolutionDir)lib\"
+			IntermediateDirectory="$(SolutionDir)build\$(ProjectName)\$(ConfigurationName)\"
+			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)include\&quot;;&quot;$(SolutionDir)lib\bzip2\&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="5"
+				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="$(IntDir)/"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="4"/>
+				DebugInformationFormat="4"
+				CompileAs="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)$(ProjectName)_d.lib"/>
+				Name="VCLinkerTool"
+				AdditionalDependencies="libbz2_d.lib ws2_32.lib"
+				OutputFile="$(OutDir)/$(ProjectName)_d.dll"
+				AdditionalLibraryDirectories="$(SolutionDir)lib\"
+				ModuleDefinitionFile="steam-condenser_d.def"
+				ImportLibrary="$(OutDir)$(TargetName).lib"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -130,6 +144,8 @@
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
 			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
@@ -137,23 +153,29 @@
 		</Configuration>
 		<Configuration
 			Name="Release_DLL|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="4"
+			OutputDirectory="$(SolutionDir)lib\"
+			IntermediateDirectory="$(SolutionDir)build\$(ProjectName)\$(ConfigurationName)\"
+			ConfigurationType="2"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)include\&quot;;&quot;$(SolutionDir)lib\bzip2\&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
-				RuntimeLibrary="4"
+				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="$(OutDir)$(TargetName).pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
-				DebugInformationFormat="3"/>
+				DebugInformationFormat="3"
+				CompileAs="1"/>
 			<Tool
 				Name="VCCustomBuildTool"/>
 			<Tool
-				Name="VCLibrarianTool"
-				OutputFile="$(OutDir)$(ProjectName).lib"/>
+				Name="VCLinkerTool"
+				AdditionalDependencies="libbz2.lib ws2_32.lib"
+				AdditionalLibraryDirectories="$(SolutionDir)lib\"
+				ModuleDefinitionFile="steam-condenser.def"
+				ProgramDatabaseFile="$(OutDir)$(TargetName).pdb"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
@@ -168,6 +190,8 @@
 				Name="VCWebServiceProxyGeneratorTool"/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"/>
+			<Tool
+				Name="VCWebDeploymentTool"/>
 			<Tool
 				Name="VCManagedWrapperGeneratorTool"/>
 			<Tool
@@ -217,6 +241,12 @@
 			Name="Resource Files"
 			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx"
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}">
+			<File
+				RelativePath=".\steam-condenser.def">
+			</File>
+			<File
+				RelativePath=".\steam-condenser_d.def">
+			</File>
 		</Filter>
 	</Files>
 	<Globals>

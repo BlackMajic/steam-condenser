@@ -4,6 +4,7 @@
 	Version="7.10"
 	Name="test"
 	ProjectGUID="{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}"
+	RootNamespace="test"
 	Keyword="Win32Proj">
 	<Platforms>
 		<Platform
@@ -12,19 +13,20 @@
 	<Configurations>
 		<Configuration
 			Name="Debug_LIB|Win32"
-			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)"
-			IntermediateDirectory="$(SolutionDir)build\$(ProjectName)\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)build\$(ProjectName)\$(ConfigurationName)\"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir)include\"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\include\&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="5"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="$(IntDir)/"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
@@ -32,11 +34,12 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="ws2_32.lib"
-				OutputFile="$(OutDir)/test.exe"
+				AdditionalDependencies="steam-condenser_dl.lib"
+				OutputFile="$(OutDir)$(ProjectName).exe"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="$(SolutionDir)lib\"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/test.pdb"
+				ProgramDatabaseFile="$(IntDir)$(TargetName).pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
@@ -62,15 +65,17 @@
 		</Configuration>
 		<Configuration
 			Name="Release_LIB|Win32"
-			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)"
-			IntermediateDirectory="$(SolutionDir)build\$(ProjectName)\$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)build\$(ProjectName)\$(ConfigurationName)\"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="$(SolutionDir)include\"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="4"
+				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="$(OutDir)$(TargetName).pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
@@ -78,9 +83,12 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/test.exe"
+				AdditionalDependencies="steam-condenser.lib"
+				OutputFile="$(OutDir)$(ProjectName).exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="$(SolutionDir)lib\"
 				GenerateDebugInformation="TRUE"
+				ProgramDatabaseFile="$(OutDir)$(TargetName).pdb"
 				SubSystem="1"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
@@ -108,18 +116,20 @@
 		</Configuration>
 		<Configuration
 			Name="Debug_DLL|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)build\$(ProjectName)\$(ConfigurationName)\"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)\include\&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="5"
+				RuntimeLibrary="1"
 				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="$(OutDir)$(TargetName).pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"/>
@@ -127,16 +137,20 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/test.exe"
+				AdditionalDependencies="steam-condenser_d.lib"
+				OutputFile="$(OutDir)$(ProjectName).exe"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="$(SolutionDir)lib\"
 				GenerateDebugInformation="TRUE"
-				ProgramDatabaseFile="$(OutDir)/test.pdb"
+				ProgramDatabaseFile="$(OutDir)$(TargetName).pdb"
 				SubSystem="1"
 				TargetMachine="1"/>
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+				CommandLine="xcopy &quot;$(SolutionDir)lib\libbz2_d.dll&quot; &quot;$(OutDir)&quot;
+xcopy &quot;$(SolutionDir)lib\steam-condenser_d.dll&quot; &quot;$(OutDir)&quot;"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool
@@ -156,15 +170,17 @@
 		</Configuration>
 		<Configuration
 			Name="Release_DLL|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)bin\$(ConfigurationName)\"
+			IntermediateDirectory="$(SolutionDir)build\$(ProjectName)\$(ConfigurationName)\"
 			ConfigurationType="1"
 			CharacterSet="2">
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories="$(SolutionDir)include\"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE"
-				RuntimeLibrary="4"
+				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
+				ProgramDataBaseFileName="$(OutDir)$(TargetName).pdb"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"/>
@@ -172,8 +188,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				OutputFile="$(OutDir)/test.exe"
+				AdditionalDependencies="steam-condenser.lib"
+				OutputFile="$(OutDir)$(ProjectName).exe"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="$(SolutionDir)lib\"
 				GenerateDebugInformation="TRUE"
 				SubSystem="1"
 				OptimizeReferences="2"
@@ -182,7 +200,10 @@
 			<Tool
 				Name="VCMIDLTool"/>
 			<Tool
-				Name="VCPostBuildEventTool"/>
+				Name="VCPostBuildEventTool"
+				CommandLine="xcopy &quot;$(SolutionDir)lib\libbz2.dll&quot; &quot;$(OutDir)&quot;
+xcopy &quot;$(SolutionDir)lib\steam-condenser.dll&quot; &quot;$(OutDir)&quot;
+xcopy &quot;$(SolutionDir)lib\steam-condenser.pdb&quot; &quot;$(OutDir)&quot;"/>
 			<Tool
 				Name="VCPreBuildEventTool"/>
 			<Tool

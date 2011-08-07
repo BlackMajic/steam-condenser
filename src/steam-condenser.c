@@ -19,11 +19,23 @@ int SC_API(sc_init)()
 	struct WSAData wsaData;
 	
 	if (ret = WSAStartup(MAKEWORD(2,2), &wsaData)) {
-		fprintf(stderr, "WSAStartup failed.\n");
-		exit(1);
+		SC_ERRORMSG("WSAStartup Failed", ret);
 	}
 #endif
 	return ret;
+}
+
+void SC_API(sc_trace)(const char *msg, unsigned int id, const char *file, unsigned int line)
+{
+	#ifdef DEBUG
+		#ifdef WIN32
+			char message[4096] = "";
+			sprintf(message, "%s (%u)\nFile: %s\nLine: %u\n", msg, id, file, line);
+			OutputDebugString(message);
+		#else
+			sprintf(stderr, "%s (%u)\nFile: %s\nLine: %u\n", msg, id, file, line);
+		#endif
+	#endif
 }
 
 // seperate address into address:port, then pass along
@@ -50,7 +62,7 @@ int SC_API(sc_openSocketAddr)(const char *address, int socktype)
 // connect() to address:port using socktype
 int SC_API(sc_openSocketAddrPort)(const char *address, const char *port, int socktype)
 {
-	int sock = 0;
+	int sock = 0, conn = 0;
 	struct addrinfo hints, *servers, *server;
 	
 	memset(&hints, 0, sizeof(hints));
@@ -59,33 +71,34 @@ int SC_API(sc_openSocketAddrPort)(const char *address, const char *port, int soc
 	hints.ai_flags		= AI_PASSIVE;
 	
 	if (getaddrinfo(address, port, &hints, &servers) != 0) {
-		perror("getaddrinfo");
-		exit(2);
+		SC_ERRORMSG("getaddrinfo failed while trying to connect to master server", SC_GETADDRINFO_FAILED);
+		return SC_GETADDRINFO_FAILED;
 	}
 	
 	for (server = servers; server != NULL; server = server->ai_next) {
 		sock = socket(server->ai_family, server->ai_socktype, server->ai_protocol);
-		if (sock == -1) {
-			perror("Sockout Error");
-		} else {
-			if (connect(sock, server->ai_addr, server->ai_addrlen) == -1) {
-				perror("Connect Error");
-			} else {
+		if (sock != -1) {
+			if (conn = connect(sock, server->ai_addr, server->ai_addrlen) != -1) {
 				struct timeval timeout;
-				timeout.tv_sec = 10;
+				timeout.tv_sec = 2;
 				timeout.tv_usec = 0;
 				if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(long)*2) == -1) {
-					fprintf(stderr, "Failed to set timeout");
+					SC_ERRORMSG("Failed to set outgoing timeout", SC_SOCKOPT_FAILED);
 				}
 				if(setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(long)*2) == -1) {
-					fprintf(stderr, "Failed to set timeout");
+					SC_ERRORMSG("Failed to set incoming timeout", SC_SOCKOPT_FAILED);
 				}
 				break;
+			} else {
+				SC_ERRORMSG("Failed to connect() to master server", SC_CONNECT_FAILED);
 			}
+		} else {
+			SC_ERRORMSG("Failed to create socket to master server", SC_SOCKET_FAILED);
 		}
 	}
-	if (sock == -1) exit(3);
 	freeaddrinfo(servers);
+	if (conn == -1) return SC_CONNECT_FAILED;
+	if (sock == -1) return SC_SOCKET_FAILED;
 	return sock;
 }
 
@@ -127,7 +140,12 @@ long SC_API(sc_readLong)(char *buffer, int *position)
 
 float SC_API(sc_readFloat)(char *buffer, int *position)
 {
-	return sc_readLong(buffer, position);
+	char f[4] = "";
+	int i = 0;
+	for (i = 0; i < 4; i++) {
+		f[i] = sc_readByte(buffer, position);
+	}
+	return *(float*)f;
 }
 
 long long SC_API(sc_readLongLong)(char *buffer, int *position)
@@ -135,17 +153,19 @@ long long SC_API(sc_readLongLong)(char *buffer, int *position)
 	return sc_readLong(buffer, position) & 0xFFFFFFFF | ((sc_readLong(buffer, position) & 0xFFFFFFFF) << 32);
 }
 
-void SC_API(sc_readString)(char *dest, char *buffer, int *position)
+void SC_API(sc_readString)(char *dest, unsigned int destLength, char *buffer, int *position)
 {
-	//strcpy(dest, buffer[*position]);
 	int i = 0;
-	while (buffer[*position] != 0x00) {
+	while (buffer[(*position)] != 0x00 && i < destLength) {
 		dest[i++] = buffer[(*position)++];
+	}
+	if (buffer[(*position)] != 0x00) {
+		SC_ERRORMSG("Source string longer than destination.", SC_OK);
+		while (buffer[(*position)++] != 0x00) {}
 	}
 	dest[i] = 0x00;
 	(*position)++;
 }
-
 
 
 /**
@@ -185,7 +205,7 @@ int inet_pton(int af, const char *src, void *dst)
 	hints.ai_family = af;
 	
 	if (getaddrinfo(src, NULL, &hints, &res) != 0) {
-		fprintf(stderr, "Couldn't resolve host %s\n", src);
+		printf("Couldn't resolve host %s\n", src);
 		return -1;
 	}
 	

@@ -44,10 +44,14 @@ void SC_API(sc_getServers)(sc_MasterServer *master, sc_Region region, const char
 		memcpy(&message[2 + addressLen], filter, filterLen);
 		
 		if (sent = send(master->socket, message, 2 + addressLen + filterLen, 0) < 2 + addressLen + filterLen) {
-			fprintf(stderr, "Unable to send all data");
+			printf("Unable to send all data");
 		}
 		
 		recvd = recv(master->socket, &buffer, 1392, 0);
+		if (recvd == -1) {
+			printf("Error receiving data");
+			break;
+		}
 		
 		// Each server listing is 6 bytes. 4*octets, 2*port
 		for (i = 0; i < recvd; i += 6) {

@@ -19,6 +19,18 @@ extern "C" {
 #define STEAM_PACKET_SIZE	1400	// max packet size a server will respond with (plus headers)
 typedef char byte;
 
+enum sc_errors {
+	SC_OK,
+	SC_STARTUP_FAILED,
+	SC_GETADDRINFO_FAILED,
+	SC_SOCKET_FAILED,
+	SC_CONNECT_FAILED,
+	SC_SOCKOPT_FAILED,
+	// Master Server
+	
+	// Game Server
+};
+
 #ifndef SC_IMPORT
 	#define SC_EXPORT
 #endif
@@ -61,7 +73,16 @@ short			SC_API(sc_readShort)			(char *buffer, int *position);
 long			SC_API(sc_readLong)				(char *buffer, int *position);
 float			SC_API(sc_readFloat)			(char *buffer, int *position);
 long long		SC_API(sc_readLongLong)			(char *buffer, int *position);
-void			SC_API(sc_readString)			(char *dest, char *buffer, int *position);
+void			SC_API(sc_readString)			(char *dest, unsigned int destLength, char *buffer, int *position);
+void			SC_API(sc_trace)				(const char *msg, unsigned int id, const char *file, unsigned int line);
+
+#ifdef DEBUG
+	#define SC_ERROR(id)			((id) != SC_OK)
+	#define SC_ERRORMSG(msg, id)	sc_trace((msg), (id), __FILE__, __LINE__)
+#else
+	#define SC_ERROR(id)
+	#define SC_ERRORMSG(msg, id)
+#endif
 
 /*******************************************************************************
  * Custom Includes
