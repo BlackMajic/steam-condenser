@@ -25,15 +25,15 @@ int SC_API(sc_init)()
 	return ret;
 }
 
-void SC_API(sc_trace)(const char *msg, unsigned int id, const char *file, unsigned int line)
+void SC_API(sc_trace)(const char *msg, int id, const char *file, unsigned int line)
 {
-	#ifdef DEBUG
+	#ifdef _DEBUG
 		#ifdef WIN32
 			char message[4096] = "";
-			sprintf(message, "%s (%u)\nFile: %s\nLine: %u\n", msg, id, file, line);
+			sprintf(message, "E%d: %s\nLine: %u - %s\n", id, msg, line, file);
 			OutputDebugString(message);
 		#else
-			sprintf(stderr, "%s (%u)\nFile: %s\nLine: %u\n", msg, id, file, line);
+			fprintf(stderr, "%s (%u)\nFile: %s\nLine: %u\n", msg, id, file, line);
 		#endif
 	#endif
 }
@@ -155,7 +155,7 @@ long long SC_API(sc_readLongLong)(char *buffer, int *position)
 
 void SC_API(sc_readString)(char *dest, unsigned int destLength, char *buffer, int *position)
 {
-	int i = 0;
+	unsigned int i = 0;
 	while (buffer[(*position)] != 0x00 && i < destLength) {
 		dest[i++] = buffer[(*position)++];
 	}
@@ -205,7 +205,7 @@ int inet_pton(int af, const char *src, void *dst)
 	hints.ai_family = af;
 	
 	if (getaddrinfo(src, NULL, &hints, &res) != 0) {
-		printf("Couldn't resolve host %s\n", src);
+		fprintf(stderr, "Couldn't resolve host %s\n", src);
 		return -1;
 	}
 	

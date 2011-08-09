@@ -23,13 +23,13 @@ sc_MasterServer* SC_API(sc_getMasterServer)(const char *address)
 // Not IPv6 Compatible on account of the master server's response
 void SC_API(sc_getServers)(sc_MasterServer *master, sc_Region region, const char *filter)
 {
-	unsigned int i=0, sent=0, recvd=0, addressLen=0;	// bytes sent/recvd, length of game server's address
-	unsigned int filterLen = strlen(filter) + 1;		// length of our filter + \0
+	int i=0, sent=0, recvd=0, addressLen=0;			// bytes sent/recvd, length of game server's address
+	unsigned int filterLen = strlen(filter) + 1;	// length of our filter + \0
 	sc_ServerList *last = NULL;
 	
 	char address[ADDRSTRLEN] = "0.0.0.0:0";
 	char addr2[ADDRSTRLEN] = "";
-	unsigned char buffer[STEAM_PACKET_SIZE] = "";						// buffer for recvd data
+	unsigned char buffer[STEAM_PACKET_SIZE] = "";								// buffer for recvd data
 	char *message = calloc(sizeof(char), 2 + ADDRSTRLEN + filterLen);	// data to send
 	
 	do {
@@ -44,12 +44,12 @@ void SC_API(sc_getServers)(sc_MasterServer *master, sc_Region region, const char
 		memcpy(&message[2 + addressLen], filter, filterLen);
 		
 		if (sent = send(master->socket, message, 2 + addressLen + filterLen, 0) < 2 + addressLen + filterLen) {
-			printf("Unable to send all data");
+			SC_ERRORMSG("Unable to send all data", SC_SEND_ERROR);
+			break;
 		}
 		
-		recvd = recv(master->socket, &buffer, 1392, 0);
-		if (recvd == -1) {
-			printf("Error receiving data");
+		if ((recvd = recv(master->socket, &buffer, 1392, 0)) < 0) {
+			SC_ERRORMSG("Error receiving data", SC_RECV_ERROR);
 			break;
 		}
 		
@@ -63,24 +63,20 @@ void SC_API(sc_getServers)(sc_MasterServer *master, sc_Region region, const char
 			address[addrlen] = ':';
 			sprintf(&address[addrlen+1], "%d", port);
 			if (strcmp(address, "0.0.0.0:0")) {
-				if (master->servers == NULL) {
-					master->servers = (sc_ServerList*)malloc(sizeof(sc_ServerList));
-					last			= master->servers;
-					strcpy(last->address, addr2);
-					sprintf(&last->port, "%d", port);
-					last->next		= NULL;
-					continue;
+				sc_ServerList *list = malloc(sizeof(sc_ServerList));
+				strcpy(list->address, addr2);
+				sprintf(&list->port, "%d", port);
+				list->next = NULL;
+				if (last) {
+					last->next = list;
+				} else {
+					master->servers = list;
 				}
-				last->next		= (sc_ServerList*)malloc(sizeof(sc_ServerList));
-				last			= last->next;
-				strcpy(last->address, addr2);
-				sprintf(&last->port, "%d", port);
-				last->next		= NULL;
+				last = list;
 			}
 		}
 		//printf("%s\n", address); // last address in packet
 	} while (strcmp(address, "0.0.0.0:0"));
-	//free(buffer);
 	free(message);
 }
 

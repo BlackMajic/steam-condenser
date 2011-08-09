@@ -19,17 +19,20 @@ extern "C" {
 #define STEAM_PACKET_SIZE	1400	// max packet size a server will respond with (plus headers)
 typedef char byte;
 
-enum sc_errors {
-	SC_OK,
-	SC_STARTUP_FAILED,
-	SC_GETADDRINFO_FAILED,
-	SC_SOCKET_FAILED,
-	SC_CONNECT_FAILED,
-	SC_SOCKOPT_FAILED,
-	// Master Server
-	
-	// Game Server
-};
+#define SC_OK					(0)
+#define SC_STARTUP_FAILED		(-1)
+#define SC_GETADDRINFO_FAILED	(-2)
+#define SC_SOCKET_FAILED		(-3)
+#define SC_CONNECT_FAILED		(-4)
+#define SC_SOCKOPT_FAILED		(-5)
+#define SC_SEND_ERROR			(-6)
+#define SC_RECV_ERROR			(-7)
+#define SC_BAD_REQ_ID			(-8)
+#define SC_BAD_PACKET_NUMBER	(-9)
+#define SC_BAD_CHECKSUM			(-10)
+#define SC_MALFORMED_PACKET		(-11)
+#define SC_MEMORY_ERROR			(-12)
+#define SC_PROTO_ERROR			(-13)
 
 #ifndef SC_IMPORT
 	#define SC_EXPORT
@@ -74,14 +77,14 @@ long			SC_API(sc_readLong)				(char *buffer, int *position);
 float			SC_API(sc_readFloat)			(char *buffer, int *position);
 long long		SC_API(sc_readLongLong)			(char *buffer, int *position);
 void			SC_API(sc_readString)			(char *dest, unsigned int destLength, char *buffer, int *position);
-void			SC_API(sc_trace)				(const char *msg, unsigned int id, const char *file, unsigned int line);
+void			SC_API(sc_trace)				(const char *msg, int id, const char *file, unsigned int line);
 
-#ifdef DEBUG
+#ifdef _DEBUG
 	#define SC_ERROR(id)			((id) != SC_OK)
-	#define SC_ERRORMSG(msg, id)	sc_trace((msg), (id), __FILE__, __LINE__)
+	#define SC_ERRORMSG(msg, id)	sc_trace(msg, id, __FILE__, __LINE__)
 #else
-	#define SC_ERROR(id)
-	#define SC_ERRORMSG(msg, id)
+	#define SC_ERROR(id)			(id)
+	#define SC_ERRORMSG(msg, id)	
 #endif
 
 /*******************************************************************************

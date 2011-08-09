@@ -29,6 +29,7 @@
 				ObjectFile="$(IntDir)"
 				ProgramDataBaseFileName="$(IntDir)"
 				WarningLevel="3"
+				WarnAsError="FALSE"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="4"
 				CompileAs="1"/>
@@ -72,6 +73,7 @@
 				UsePrecompiledHeader="0"
 				ProgramDataBaseFileName="$(OutDir)$(TargetName).pdb"
 				WarningLevel="3"
+				WarnAsError="FALSE"
 				Detect64BitPortabilityProblems="TRUE"
 				DebugInformationFormat="3"
 				CompileAs="1"/>

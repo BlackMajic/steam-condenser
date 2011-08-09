@@ -128,9 +128,6 @@ SC_EXTERN void SC_API(sc_getChallenge)	(sc_GameServer *server);
 SC_EXTERN void SC_API(sc_getPlayers)	(sc_GameServer *server, BOOL isGoldSrc);
 SC_EXTERN void SC_API(sc_getRules)		(sc_GameServer *server, BOOL isGoldSrc);
 
-SC_EXTERN void SC_API(sc_updatePlayers)	(sc_GameServer *server);
-SC_EXTERN void SC_API(sc_updateRules)	(sc_GameServer *server);
-
 SC_EXTERN void SC_API(sc_freePlayers)	(sc_Players *players);
 SC_EXTERN void SC_API(sc_freeRules)		(sc_Rules *players);
 SC_EXTERN void SC_API(sc_freeGameServer)(sc_GameServer *server);

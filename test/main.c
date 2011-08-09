@@ -20,7 +20,7 @@ extern "C" {
 #include <stdlib.h>
 
 void printServers();
-void printServerInfo(const char *address);
+void printServerInfo(const char *address, BOOL goldSrc);
 
 int main(int argc, char *argv[])
 {
@@ -28,10 +28,7 @@ int main(int argc, char *argv[])
 	
 	if (SC_ERROR(sc_init())) {
 		printf("error");
-	} else {
-		printf("good");
 	}
-	
 	printServers();
 	
 	//printServerInfo(addr, FALSE);

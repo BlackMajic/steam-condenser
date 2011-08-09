@@ -14,8 +14,6 @@ EXPORTS
 	sc_getChallenge
 	sc_getPlayers
 	sc_getRules
-	sc_updatePlayers
-	sc_updateRules
 	sc_freePlayers
 	sc_freeRules
 	sc_freeGameServer
