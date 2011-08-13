@@ -120,7 +120,7 @@ typedef struct sc_GameServer {
 SC_EXTERN sc_GameServer* SC_API(sc_getGameServerFromString)	(const char *address);
 SC_EXTERN sc_GameServer* SC_API(sc_getGameServer)			(const char *address, const char *port);
 
-char* SC_API(sc_combineSplitPackets)(int socket, char *buffer, int *pos, int recvd, BOOL isGoldSrc);
+unsigned char* SC_API(sc_combineSplitPackets)(int socket, unsigned char *buffer, int *pos, int recvd, BOOL isGoldSrc);
 
 SC_EXTERN int  SC_API(sc_getPing)		(sc_GameServer *server);
 SC_EXTERN void SC_API(sc_getServerInfo)	(sc_GameServer *server, BOOL isGoldSrc);

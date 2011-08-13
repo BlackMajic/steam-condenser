@@ -49,10 +49,11 @@ typedef char byte;
 		#define SC_EXTERN
 		#define SC_API(func)	(WINAPI * func)
 	#endif
-	#ifndef HAVE_INET_NTOP
-		const char*	inet_ntop(int af, const void *src, char *dst, socklen_t cnt);
+	#ifndef NTDDI_VISTA
+		#define NTDDI_VISTA		0x06000000
 	#endif
-	#ifndef HAVE_INET_PTON
+	#if (NTDDI_VERSION < NTDDI_VISTA)
+		const char*	inet_ntop(int af, const void *src, char *dst, socklen_t cnt);
 		int			inet_pton(int af, const char *src, void *dst);
 	#endif
 #else
@@ -71,12 +72,12 @@ SC_EXTERN void	SC_API(sc_end)					();
 int				SC_API(sc_openSocketAddr)		(const char *address, int socktype);
 int				SC_API(sc_openSocketAddrPort)	(const char *address, const char *port, int socktype);
 void			SC_API(sc_closeSocket)			(int *socket);
-byte			SC_API(sc_readByte)				(char *buffer, int *position);
-short			SC_API(sc_readShort)			(char *buffer, int *position);
-long			SC_API(sc_readLong)				(char *buffer, int *position);
-float			SC_API(sc_readFloat)			(char *buffer, int *position);
-long long		SC_API(sc_readLongLong)			(char *buffer, int *position);
-void			SC_API(sc_readString)			(char *dest, unsigned int destLength, char *buffer, int *position);
+byte			SC_API(sc_readByte)				(unsigned char *buffer, int *position);
+short			SC_API(sc_readShort)			(unsigned char *buffer, int *position);
+long			SC_API(sc_readLong)				(unsigned char *buffer, int *position);
+float			SC_API(sc_readFloat)			(unsigned char *buffer, int *position);
+long long		SC_API(sc_readLongLong)			(unsigned char *buffer, int *position);
+void			SC_API(sc_readString)			(char *dest, unsigned int destLength, unsigned char *buffer, int *position);
 void			SC_API(sc_trace)				(const char *msg, int id, const char *file, unsigned int line);
 
 #ifdef _DEBUG

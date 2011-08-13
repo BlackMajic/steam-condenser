@@ -1,5 +1,9 @@
 bin
 build
 lib
+ipch
 *.ncb
 *.suo
+*.sdf
+*.opensdf
+*.user

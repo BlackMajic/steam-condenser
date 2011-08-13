@@ -18,14 +18,14 @@
 
 sc_GameServer* SC_API(sc_getGameServerFromString)(const char *address)
 {
-	sc_GameServer *ret = calloc(sizeof(sc_GameServer), 1);
+	sc_GameServer *ret = (sc_GameServer*)calloc(sizeof(sc_GameServer), 1);
 	ret->socketUDP = sc_openSocketAddr(address, SOCK_DGRAM); // open socket() and connect()
 	return ret;
 }
 
 sc_GameServer* SC_API(sc_getGameServer)(const char *address, const char *port)
 {
-	sc_GameServer *ret = calloc(sizeof(sc_GameServer), 1);
+	sc_GameServer *ret = (sc_GameServer*)calloc(sizeof(sc_GameServer), 1);
 	ret->socketUDP = sc_openSocketAddrPort(address, port, SOCK_DGRAM); // open socket() and connect()
 	return ret;
 }
@@ -42,7 +42,7 @@ int SC_API(sc_getPing)(sc_GameServer *server)
 		SC_ERRORMSG("Unable to send all data", SC_SEND_ERROR);
 	}
 	
-	if ((recvd = recv(server->socketUDP, &buffer, STEAM_PACKET_SIZE, 0)) < 0) {
+	if ((recvd = recv(server->socketUDP, (char*)&buffer, STEAM_PACKET_SIZE, 0)) < 0) {
 		SC_ERRORMSG("Error receiving data", SC_RECV_ERROR);
 	}
 	
@@ -51,11 +51,11 @@ int SC_API(sc_getPing)(sc_GameServer *server)
 	return server->ping;
 }
 
-char* SC_API(sc_combineSplitPackets)(int socket, char *buffer, int *pos, int recvd, BOOL isGoldSrc)
+unsigned char* SC_API(sc_combineSplitPackets)(int socket, unsigned char *buffer, int *pos, int recvd, BOOL isGoldSrc)
 {
 	unsigned long requestID = 0;
 	unsigned long checksum = 0;
-	unsigned long fullDataSize = 0;
+	unsigned int fullDataSize = 0;
 	unsigned short splitSize = 0;
 	unsigned char *packet = NULL;
 	byte packetCount = 0;
@@ -101,12 +101,12 @@ char* SC_API(sc_combineSplitPackets)(int socket, char *buffer, int *pos, int rec
 				return NULL;
 			}
 			// populate packet
-			if (!packet) packet = calloc(splitSize * packetCount, 1);
+			if (!packet) packet = (unsigned char*)calloc(splitSize * packetCount, 1);
 			memcpy(&packet[splitSize * packetNumber], &buffer[(*pos)], splitSize);
 		}
 		
 		if (recvdPackets < packetCount) {
-			if (recvd = recv(socket, buffer, STEAM_PACKET_SIZE, 0) > 0) {
+			if (recvd = recv(socket, (char*)buffer, STEAM_PACKET_SIZE, 0) > 0) {
 				recvdPackets++;
 			} else {
 				if (errno == EAGAIN) {
@@ -124,9 +124,9 @@ char* SC_API(sc_combineSplitPackets)(int socket, char *buffer, int *pos, int rec
 	if (isCompressed) {
 		// decompress
 		int bz = 0;
-		unsigned char *temp = malloc(fullDataSize);
+		char *temp = (char*)malloc(fullDataSize);
 		if (bz = BZ2_bzBuffToBuffDecompress(temp, &fullDataSize,
-											packet, splitSize * packetCount,
+											(char*)packet, splitSize * packetCount,
 											0, 0) == BZ_OK)
 		{
 			// TODO: crc32 check
@@ -139,7 +139,7 @@ char* SC_API(sc_combineSplitPackets)(int socket, char *buffer, int *pos, int rec
 			free(temp); temp = NULL;
 		}
 		free(packet);
-		packet = temp;
+		packet = (unsigned char*)temp;
 	}
 	if ((*pos) > 0)
 		SC_ERRORMSG("position nonzero after combining packets", SC_OK);
@@ -149,7 +149,7 @@ char* SC_API(sc_combineSplitPackets)(int socket, char *buffer, int *pos, int rec
 void SC_API(sc_getServerInfo)(sc_GameServer *server, BOOL isGoldSrc)
 {
 	int sent = 0, recvd = 0;
-	unsigned int pos = 0;
+	int pos = 0;
 	unsigned char buffer[STEAM_PACKET_SIZE] = "";
 	unsigned char *packet = NULL;
 	
@@ -157,29 +157,29 @@ void SC_API(sc_getServerInfo)(sc_GameServer *server, BOOL isGoldSrc)
 		SC_ERRORMSG("Unable to send all data", SC_SEND_ERROR);
 	}
 	
-	if ((recvd = recv(server->socketUDP, &buffer, STEAM_PACKET_SIZE, 0)) < 0) {
+	if ((recvd = recv(server->socketUDP, (char*)&buffer, STEAM_PACKET_SIZE, 0)) < 0) {
 		SC_ERRORMSG("Error receiving data", SC_RECV_ERROR);
 		return;
 	}
-	if (sc_readLong(&buffer, &pos) == -2) {
-		packet = sc_combineSplitPackets(server->socketUDP, &buffer, &pos, recvd, isGoldSrc);
+	if (sc_readLong(&buffer[0], &pos) == -2) {
+		packet = sc_combineSplitPackets(server->socketUDP, &buffer[0], &pos, recvd, isGoldSrc);
 		if (!packet) return;
 	}
-	if (!packet) packet = &buffer;
+	if (!packet) packet = &buffer[0];
 	pos = 0;
 	if (sc_readLong(packet, &pos) != -1) {
 		SC_ERRORMSG("Packet is malformed", SC_MALFORMED_PACKET);
-		if (packet != &buffer) free(packet);
+		if (packet != &buffer[0]) free(packet);
 		return;
 	}
 	
 	server->info.type				= sc_readByte(packet, &pos);
 	if (!isGoldSrc) {
 		server->info.npVersion		= sc_readByte(packet, &pos);
-		sc_readString(&server->info.hostname, sizeof(server->info.hostname), packet, &pos);
-		sc_readString(&server->info.map, sizeof(server->info.map), packet, &pos);
-		sc_readString(&server->info.gameDir, sizeof(server->info.gameDir), packet, &pos);
-		sc_readString(&server->info.gameDesc, sizeof(server->info.gameDesc), packet, &pos);
+		sc_readString(&server->info.hostname[0], sizeof(server->info.hostname), packet, &pos);
+		sc_readString(&server->info.map[0], sizeof(server->info.map), packet, &pos);
+		sc_readString(&server->info.gameDir[0], sizeof(server->info.gameDir), packet, &pos);
+		sc_readString(&server->info.gameDesc[0], sizeof(server->info.gameDesc), packet, &pos);
 		server->info.appID			= sc_readShort(packet, &pos);
 		server->numPlayers			= sc_readByte(packet, &pos);
 		server->info.maxPlayers		= sc_readByte(packet, &pos);
@@ -188,7 +188,7 @@ void SC_API(sc_getServerInfo)(sc_GameServer *server, BOOL isGoldSrc)
 		server->info.os				= sc_readByte(packet, &pos);
 		server->info.password		= sc_readByte(packet, &pos);
 		server->info.secure			= sc_readByte(packet, &pos);
-		sc_readString(&server->info.gameVersion, sizeof(server->info.gameVersion), packet, &pos);
+		sc_readString(&server->info.gameVersion[0], sizeof(server->info.gameVersion), packet, &pos);
 		server->info.EDF			= sc_readByte(packet, &pos);
 		if (server->info.EDF & 0x80)
 			server->info.port		= sc_readShort(packet, &pos);
@@ -196,18 +196,18 @@ void SC_API(sc_getServerInfo)(sc_GameServer *server, BOOL isGoldSrc)
 			server->info.steamID	= sc_readLongLong(packet, &pos);
 		if (server->info.EDF & 0x40) {
 			server->info.specPort	= sc_readShort(packet, &pos);
-			sc_readString(&server->info.specName, sizeof(server->info.specName), packet, &pos);
+			sc_readString(&server->info.specName[0], sizeof(server->info.specName), packet, &pos);
 		}
 		if (server->info.EDF & 0x20)
-			sc_readString(server->info.tags, sizeof(server->info.tags), packet, &pos);
+			sc_readString(&server->info.tags[0], sizeof(server->info.tags), packet, &pos);
 		if (server->info.EDF & 0x01)
 			server->info.appID2		= sc_readShort(packet, &pos);
 	} else {
-		sc_readString(&server->info.gameIP, sizeof(server->info.gameIP), packet, &pos);
-		sc_readString(&server->info.hostname, sizeof(server->info.hostname), packet, &pos);
-		sc_readString(&server->info.map, sizeof(server->info.map), packet, &pos);
-		sc_readString(&server->info.gameDir, sizeof(server->info.gameDir), packet, &pos);
-		sc_readString(&server->info.gameDesc, sizeof(server->info.gameDesc), packet, &pos);
+		sc_readString(&server->info.gameIP[0], sizeof(server->info.gameIP), packet, &pos);
+		sc_readString(&server->info.hostname[0], sizeof(server->info.hostname), packet, &pos);
+		sc_readString(&server->info.map[0], sizeof(server->info.map), packet, &pos);
+		sc_readString(&server->info.gameDir[0], sizeof(server->info.gameDir), packet, &pos);
+		sc_readString(&server->info.gameDesc[0], sizeof(server->info.gameDesc), packet, &pos);
 		server->info.numPlayers		= sc_readByte(packet, &pos);
 		server->info.maxPlayers		= sc_readByte(packet, &pos);
 		server->info.npVersion		= sc_readByte(packet, &pos);
@@ -216,8 +216,8 @@ void SC_API(sc_getServerInfo)(sc_GameServer *server, BOOL isGoldSrc)
 		server->info.password		= sc_readByte(packet, &pos);
 		server->info.isMod			= sc_readByte(packet, &pos);
 		if (server->info.isMod) {
-			sc_readString(&server->info.modInfo.urlInfo, sizeof(server->info.modInfo.urlInfo), packet, &pos);
-			sc_readString(&server->info.modInfo.urlDL, sizeof(server->info.modInfo.urlDL), packet, &pos);
+			sc_readString(&server->info.modInfo.urlInfo[0], sizeof(server->info.modInfo.urlInfo), packet, &pos);
+			sc_readString(&server->info.modInfo.urlDL[0], sizeof(server->info.modInfo.urlDL), packet, &pos);
 			sc_readByte(packet, &pos);
 			server->info.modInfo.version	= sc_readLong(packet, &pos);
 			server->info.modInfo.dlSize		= sc_readLong(packet, &pos);
@@ -227,29 +227,29 @@ void SC_API(sc_getServerInfo)(sc_GameServer *server, BOOL isGoldSrc)
 		server->info.secure			= sc_readByte(packet, &pos);
 		server->info.numBots		= sc_readByte(packet, &pos);
 	}
-	if (packet != &buffer) free(packet);
+	if (packet != &buffer[0]) free(packet);
 }
 
 void SC_API(sc_getChallenge)(sc_GameServer *server)
 {
 	int sent = 0, recvd = 0;
-	unsigned int pos = 0;
+	int pos = 0;
 	unsigned char buffer[STEAM_PACKET_SIZE] = "";
-	char message[10] = "\xFF\xFF\xFF\xFF\x55\0xFF\0xFF\0xFF\0xFF";
+	char message[10] = "\xFF\xFF\xFF\xFF\x55\xFF\xFF\xFF\xFF";
 	// get a challenge number
-	if (sent = send(server->socketUDP, &message, A2S_RULES_SIZE+4, 0) < A2S_RULES_SIZE+4) {
+	if (sent = send(server->socketUDP, &message[0], A2S_RULES_SIZE+4, 0) < A2S_RULES_SIZE+4) {
 		SC_ERRORMSG("Unable to send all data", SC_SEND_ERROR);
 		return;
 	}
 	
-	if ((recvd = recv(server->socketUDP, &buffer, STEAM_PACKET_SIZE, 0)) < 0) {
+	if ((recvd = recv(server->socketUDP, (char*)&buffer, STEAM_PACKET_SIZE, 0)) < 0) {
 		SC_ERRORMSG("Error receiving data", SC_RECV_ERROR);
 		return;
 	}
 	
-	if (sc_readLong(&buffer, &pos) == -1) {
-		if (sc_readByte(&buffer, &pos) == A2S_SERVERQUERY_GETCHALLENGE_ACK) {
-			server->challenge = sc_readLong(&buffer, &pos);
+	if (sc_readLong(&buffer[0], &pos) == -1) {
+		if (sc_readByte(&buffer[0], &pos) == A2S_SERVERQUERY_GETCHALLENGE_ACK) {
+			server->challenge = sc_readLong(&buffer[0], &pos);
 		}
 	}
 }
@@ -257,14 +257,14 @@ void SC_API(sc_getChallenge)(sc_GameServer *server)
 void SC_API(sc_getPlayers)(sc_GameServer *server, BOOL isGoldSrc)
 {
 	int sent = 0, recvd = 0;
-	unsigned int pos = 0;
+	int pos = 0;
 	unsigned char buffer[STEAM_PACKET_SIZE] = "";
 	unsigned char *packet = NULL;
 	sc_Players *last = NULL;
 	int i = 0;
-	char message[10] = "\xFF\xFF\xFF\xFF\x55\0xFF\0xFF\0xFF\0xFF";
+	char message[10] = "\xFF\xFF\xFF\xFF\x55\xFF\xFF\xFF\xFF";
 	
-	if (server->players) sc_freePlayers(server);
+	if (server->players) sc_freePlayers(server->players);
 	if (!server->challenge) sc_getChallenge(server);
 	
 	if (server->challenge) {
@@ -274,24 +274,24 @@ void SC_API(sc_getPlayers)(sc_GameServer *server, BOOL isGoldSrc)
 		message[8] = (char)((server->challenge & 0xFF000000) >> 24);
 	}
 	
-	if ((sent = send(server->socketUDP, &message, A2S_PLAYER_SIZE+4, 0)) < A2S_PLAYER_SIZE+4) {
+	if ((sent = send(server->socketUDP, &message[0], A2S_PLAYER_SIZE+4, 0)) < A2S_PLAYER_SIZE+4) {
 		SC_ERRORMSG("Unable to send all data", SC_SEND_ERROR);
 		return;
 	}
 	
-	if ((recvd = recv(server->socketUDP, &buffer, STEAM_PACKET_SIZE, 0)) < 0) {
+	if ((recvd = recv(server->socketUDP, (char*)&buffer, STEAM_PACKET_SIZE, 0)) < 0) {
 		SC_ERRORMSG("Error receiving data", SC_RECV_ERROR);
 		return;
 	}
-	if (sc_readLong(&buffer, &pos) == -2) {
-		packet = sc_combineSplitPackets(server->socketUDP, &buffer, &pos, recvd, isGoldSrc);
+	if (sc_readLong(&buffer[0], &pos) == -2) {
+		packet = sc_combineSplitPackets(server->socketUDP, &buffer[0], &pos, recvd, isGoldSrc);
 		if (!packet) return;
 	}
-	if (!packet) packet = &buffer;
+	if (!packet) packet = &buffer[0];
 	pos = 0;
 	if (sc_readLong(packet, &pos) != -1) {
 		SC_ERRORMSG("Packet is malformed", SC_MALFORMED_PACKET);
-		if (packet != &buffer) free(packet);
+		if (packet != &buffer[0]) free(packet);
 		return;
 	}
 	
@@ -299,9 +299,9 @@ void SC_API(sc_getPlayers)(sc_GameServer *server, BOOL isGoldSrc)
 	
 	server->numPlayers = sc_readByte(packet, &pos);
 	for (i = 0; i < server->numPlayers; i++) {
-		sc_Players *player = malloc(sizeof(sc_Players));
+		sc_Players *player = (sc_Players*)malloc(sizeof(sc_Players));
 		player->index	= sc_readByte(packet, &pos);
-		sc_readString(&player->name, sizeof(player->name), packet, &pos);
+		sc_readString(&player->name[0], sizeof(player->name), packet, &pos);
 		player->kills	= sc_readLong(packet, &pos);
 		player->time	= sc_readFloat(packet, &pos);
 		player->next	= NULL;
@@ -312,20 +312,20 @@ void SC_API(sc_getPlayers)(sc_GameServer *server, BOOL isGoldSrc)
 		}
 		last = player;
 	}
-	if (packet != &buffer) free(packet);
+	if (packet != &buffer[0]) free(packet);
 }
 
 void SC_API(sc_getRules)(sc_GameServer *server, BOOL isGoldSrc)
 {
 	int sent = 0, recvd = 0;
-	unsigned int pos = 0;
+	int pos = 0;
 	unsigned char buffer[STEAM_PACKET_SIZE] = "";
 	unsigned char *packet = NULL;
 	sc_Rules *last = NULL;
 	int i = 0;
-	char message[10] = "\xFF\xFF\xFF\xFF\x56\0xFF\0xFF\0xFF\0xFF";
+	char message[10] = "\xFF\xFF\xFF\xFF\x56\xFF\xFF\xFF\xFF";
 	
-	if (server->rules) sc_freeRules(server);
+	if (server->rules) sc_freeRules(server->rules);
 	if (!server->challenge) sc_getChallenge(server);
 	
 	if (server->challenge) {
@@ -335,24 +335,24 @@ void SC_API(sc_getRules)(sc_GameServer *server, BOOL isGoldSrc)
 		message[8] = (char)((server->challenge & 0xFF000000) >> 24);
 	}
 	
-	if ((sent = send(server->socketUDP, &message, A2S_RULES_SIZE+4, 0)) < A2S_RULES_SIZE+4) {
+	if ((sent = send(server->socketUDP, &message[0], A2S_RULES_SIZE+4, 0)) < A2S_RULES_SIZE+4) {
 		SC_ERRORMSG("Unable to send all data", SC_SEND_ERROR);
 		return;
 	}
 	
-	if ((recvd = recv(server->socketUDP, &buffer, STEAM_PACKET_SIZE, 0)) < 0) {
+	if ((recvd = recv(server->socketUDP, (char*)&buffer, STEAM_PACKET_SIZE, 0)) < 0) {
 		SC_ERRORMSG("Error receiving data", SC_RECV_ERROR);
 		return;
 	}
-	if (sc_readLong(&buffer, &pos) == -2) {
-		packet = sc_combineSplitPackets(server->socketUDP, &buffer, &pos, recvd, isGoldSrc);
+	if (sc_readLong(&buffer[0], &pos) == -2) {
+		packet = sc_combineSplitPackets(server->socketUDP, &buffer[0], &pos, recvd, isGoldSrc);
 		if (!packet) return;
 	}
-	if (!packet) packet = &buffer;
+	if (!packet) packet = &buffer[0];
 	pos = 0;
 	if (sc_readLong(packet, &pos) != -1) {
 		SC_ERRORMSG("Packet is malformed", SC_MALFORMED_PACKET);
-		if (packet != &buffer) free(packet);
+		if (packet != &buffer[0]) free(packet);
 		return;
 	}
 	
@@ -360,9 +360,9 @@ void SC_API(sc_getRules)(sc_GameServer *server, BOOL isGoldSrc)
 	
 	server->numRules = sc_readShort(packet, &pos);
 	for (i = 0; i < server->numRules; i++) {
-		sc_Rules *rule = malloc(sizeof(sc_Rules));
-		sc_readString(&rule->name, sizeof(rule->name), packet, &pos);
-		sc_readString(&rule->value, sizeof(rule->value), packet, &pos);
+		sc_Rules *rule = (sc_Rules*)malloc(sizeof(sc_Rules));
+		sc_readString(&rule->name[0], sizeof(rule->name), packet, &pos);
+		sc_readString(&rule->value[0], sizeof(rule->value), packet, &pos);
 		rule->next = NULL;
 		if (!strcmp(rule->name, "") && !strcmp(rule->value, "")) {
 			SC_ERRORMSG("Blank Rule", SC_PROTO_ERROR);
@@ -378,7 +378,7 @@ void SC_API(sc_getRules)(sc_GameServer *server, BOOL isGoldSrc)
 		}
 		last = rule;
 	}
-	if (packet != &buffer) free(packet);
+	if (packet != &buffer[0]) free(packet);
 }
 
 void SC_API(sc_freePlayers)(sc_Players *players)

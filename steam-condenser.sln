@@ -1,53 +1,45 @@
-Microsoft Visual Studio Solution File, Format Version 8.00
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "steam-condenser", "src\steam-condenser.vcproj", "{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}"
-	ProjectSection(ProjectDependencies) = postProject
-		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0} = {48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}
-	EndProjectSection
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "steam-condenser", "src\steam-condenser.vcxproj", "{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcproj", "{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}"
-	ProjectSection(ProjectDependencies) = postProject
-		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB} = {0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test\test.vcxproj", "{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libbz2", "src\libbz2.vcproj", "{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}"
-	ProjectSection(ProjectDependencies) = postProject
-	EndProjectSection
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libbz2", "src\libbz2.vcxproj", "{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}"
 EndProject
 Global
-	GlobalSection(SolutionConfiguration) = preSolution
-		Debug_DLL = Debug_DLL
-		Debug_LIB = Debug_LIB
-		Release_DLL = Release_DLL
-		Release_LIB = Release_LIB
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug_DLL|Win32 = Debug_DLL|Win32
+		Debug_LIB|Win32 = Debug_LIB|Win32
+		Release_DLL|Win32 = Release_DLL|Win32
+		Release_LIB|Win32 = Release_LIB|Win32
 	EndGlobalSection
-	GlobalSection(ProjectConfiguration) = postSolution
-		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Debug_DLL.ActiveCfg = Debug_DLL|Win32
-		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Debug_DLL.Build.0 = Debug_DLL|Win32
-		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Debug_LIB.ActiveCfg = Debug_LIB|Win32
-		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Debug_LIB.Build.0 = Debug_LIB|Win32
-		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Release_DLL.ActiveCfg = Release_DLL|Win32
-		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Release_DLL.Build.0 = Release_DLL|Win32
-		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Release_LIB.ActiveCfg = Release_LIB|Win32
-		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Release_LIB.Build.0 = Release_LIB|Win32
-		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Debug_DLL.ActiveCfg = Debug_DLL|Win32
-		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Debug_DLL.Build.0 = Debug_DLL|Win32
-		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Debug_LIB.ActiveCfg = Debug_LIB|Win32
-		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Debug_LIB.Build.0 = Debug_LIB|Win32
-		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Release_DLL.ActiveCfg = Release_DLL|Win32
-		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Release_DLL.Build.0 = Release_DLL|Win32
-		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Release_LIB.ActiveCfg = Release_LIB|Win32
-		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Release_LIB.Build.0 = Release_LIB|Win32
-		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}.Debug_DLL.ActiveCfg = Debug_DLL|Win32
-		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}.Debug_DLL.Build.0 = Debug_DLL|Win32
-		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}.Debug_LIB.ActiveCfg = Debug_LIB|Win32
-		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}.Debug_LIB.Build.0 = Debug_LIB|Win32
-		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}.Release_DLL.ActiveCfg = Release_DLL|Win32
-		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}.Release_DLL.Build.0 = Release_DLL|Win32
-		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}.Release_LIB.ActiveCfg = Release_LIB|Win32
-		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}.Release_LIB.Build.0 = Release_LIB|Win32
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Debug_DLL|Win32.ActiveCfg = Debug_DLL|Win32
+		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Debug_DLL|Win32.Build.0 = Debug_DLL|Win32
+		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Debug_LIB|Win32.ActiveCfg = Debug_LIB|Win32
+		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Debug_LIB|Win32.Build.0 = Debug_LIB|Win32
+		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Release_DLL|Win32.ActiveCfg = Release_DLL|Win32
+		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Release_DLL|Win32.Build.0 = Release_DLL|Win32
+		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Release_LIB|Win32.ActiveCfg = Release_LIB|Win32
+		{0CC214CD-B7E6-4D80-8631-2B69ECAFA4CB}.Release_LIB|Win32.Build.0 = Release_LIB|Win32
+		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Debug_DLL|Win32.ActiveCfg = Debug_DLL|Win32
+		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Debug_DLL|Win32.Build.0 = Debug_DLL|Win32
+		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Debug_LIB|Win32.ActiveCfg = Debug_LIB|Win32
+		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Debug_LIB|Win32.Build.0 = Debug_LIB|Win32
+		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Release_DLL|Win32.ActiveCfg = Release_DLL|Win32
+		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Release_DLL|Win32.Build.0 = Release_DLL|Win32
+		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Release_LIB|Win32.ActiveCfg = Release_LIB|Win32
+		{BC93B565-ABCE-4371-A0F4-7C5EC957ACD1}.Release_LIB|Win32.Build.0 = Release_LIB|Win32
+		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}.Debug_DLL|Win32.ActiveCfg = Debug_DLL|Win32
+		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}.Debug_DLL|Win32.Build.0 = Debug_DLL|Win32
+		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}.Debug_LIB|Win32.ActiveCfg = Debug_LIB|Win32
+		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}.Debug_LIB|Win32.Build.0 = Debug_LIB|Win32
+		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}.Release_DLL|Win32.ActiveCfg = Release_DLL|Win32
+		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}.Release_DLL|Win32.Build.0 = Release_DLL|Win32
+		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}.Release_LIB|Win32.ActiveCfg = Release_LIB|Win32
+		{48FED5E2-AAE5-4B5D-A450-C769FFA6FBB0}.Release_LIB|Win32.Build.0 = Release_LIB|Win32
 	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-	EndGlobalSection
-	GlobalSection(ExtensibilityAddIns) = postSolution
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

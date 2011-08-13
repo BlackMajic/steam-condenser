@@ -30,10 +30,10 @@ void SC_API(sc_trace)(const char *msg, int id, const char *file, unsigned int li
 	#ifdef _DEBUG
 		#ifdef WIN32
 			char message[4096] = "";
-			sprintf(message, "E%d: %s\nLine: %u - %s\n", id, msg, line, file);
+			sprintf(message, "%s(%u): Error %d: %s\n", file, line, id, msg);
 			OutputDebugString(message);
 		#else
-			fprintf(stderr, "%s (%u)\nFile: %s\nLine: %u\n", msg, id, file, line);
+			fprintf(stderr,  "%s(%u): Error %d: %s\n", file, line, id, msg);
 		#endif
 	#endif
 }
@@ -79,6 +79,15 @@ int SC_API(sc_openSocketAddrPort)(const char *address, const char *port, int soc
 		sock = socket(server->ai_family, server->ai_socktype, server->ai_protocol);
 		if (sock != -1) {
 			if (conn = connect(sock, server->ai_addr, server->ai_addrlen) != -1) {
+				#ifdef WIN32
+				DWORD timeout = 2000;
+				if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (const char*)&timeout, sizeof(long)*2) == -1) {
+					SC_ERRORMSG("Failed to set outgoing timeout", SC_SOCKOPT_FAILED);
+				}
+				if(setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(long)*2) == -1) {
+					SC_ERRORMSG("Failed to set incoming timeout", SC_SOCKOPT_FAILED);
+				}
+				#else
 				struct timeval timeout;
 				timeout.tv_sec = 2;
 				timeout.tv_usec = 0;
@@ -88,6 +97,8 @@ int SC_API(sc_openSocketAddrPort)(const char *address, const char *port, int soc
 				if(setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(long)*2) == -1) {
 					SC_ERRORMSG("Failed to set incoming timeout", SC_SOCKOPT_FAILED);
 				}
+				#endif
+				
 				break;
 			} else {
 				SC_ERRORMSG("Failed to connect() to master server", SC_CONNECT_FAILED);
@@ -123,22 +134,22 @@ void SC_API(sc_end)()
 /**
  * Valve stores everything in little endian except the serverlist from master server.
  */
-byte SC_API(sc_readByte)(char *buffer, int *position)
+byte SC_API(sc_readByte)(unsigned char *buffer, int *position)
 {
 	return buffer[(*position)++];
 }
 
-short SC_API(sc_readShort)(char *buffer, int *position)
+short SC_API(sc_readShort)(unsigned char *buffer, int *position)
 {
 	return sc_readByte(buffer, position) & 0xFF | ((sc_readByte(buffer, position) & 0xFF) << 8);
 }
 
-long SC_API(sc_readLong)(char *buffer, int *position)
+long SC_API(sc_readLong)(unsigned char *buffer, int *position)
 {
 	return sc_readShort(buffer, position) & 0xFFFF | ((sc_readShort(buffer, position) & 0xFFFF) << 16);
 }
 
-float SC_API(sc_readFloat)(char *buffer, int *position)
+float SC_API(sc_readFloat)(unsigned char *buffer, int *position)
 {
 	char f[4] = "";
 	int i = 0;
@@ -148,12 +159,12 @@ float SC_API(sc_readFloat)(char *buffer, int *position)
 	return *(float*)f;
 }
 
-long long SC_API(sc_readLongLong)(char *buffer, int *position)
+long long SC_API(sc_readLongLong)(unsigned char *buffer, int *position)
 {
-	return sc_readLong(buffer, position) & 0xFFFFFFFF | ((sc_readLong(buffer, position) & 0xFFFFFFFF) << 32);
+	return sc_readLong(buffer, position) & 0xFFFFFFFF | ((long long)(sc_readLong(buffer, position) & 0xFFFFFFFF) << 32);
 }
 
-void SC_API(sc_readString)(char *dest, unsigned int destLength, char *buffer, int *position)
+void SC_API(sc_readString)(char *dest, unsigned int destLength, unsigned char *buffer, int *position)
 {
 	unsigned int i = 0;
 	while (buffer[(*position)] != 0x00 && i < destLength) {
@@ -173,8 +184,7 @@ void SC_API(sc_readString)(char *dest, unsigned int destLength, char *buffer, in
  * original source: http://www.mail-archive.com/users@ipv6.org/msg02107.html
  */
 #ifdef WIN32
-#ifndef HAVE_INET_NTOP
-#define HAVE_INET_NTOP
+#if (NTDDI_VERSION < NTDDI_VISTA)
 const char* inet_ntop(int af, const void *src, char *dst, socklen_t cnt)
 {
 	if (af == AF_INET) {
@@ -194,10 +204,7 @@ const char* inet_ntop(int af, const void *src, char *dst, socklen_t cnt)
 	}
 	return NULL;
 }
-#endif // HAVE_INET_NTOP
 
-#ifndef HAVE_INET_PTON
-#define HAVE_INET_PTON
 int inet_pton(int af, const char *src, void *dst)
 {
 	struct addrinfo hints, *res, *ressave;

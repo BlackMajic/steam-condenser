@@ -1,0 +1,53 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source Files\steam">
+      <UniqueIdentifier>{2499ad9f-fda5-433f-9422-8efc1321071a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Header Files\steam">
+      <UniqueIdentifier>{0b50f79b-276a-479c-919e-86a9aeb305c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="steam-condenser.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GameServer.c">
+      <Filter>Source Files\steam</Filter>
+    </ClCompile>
+    <ClCompile Include="MasterServer.c">
+      <Filter>Source Files\steam</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\steam-condenser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\GameServer.h">
+      <Filter>Header Files\steam</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\MasterServer.h">
+      <Filter>Header Files\steam</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="steam-condenser.def">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="steam-condenser_d.def">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>

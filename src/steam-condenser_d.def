@@ -1,5 +1,5 @@
 LIBRARY			STEAM-CONDENSER_D
-DESCRIPTION		"steam-condenser: A library for querying GoldSrc, Source, Steam master servers, and the Steam Community"
+DESCRIPTION		"steam-condenser (debug): A library for querying GoldSrc, Source, Steam master servers, and the Steam Community"
 EXPORTS
 	sc_init
 	
