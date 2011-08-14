@@ -81,7 +81,7 @@ void			SC_API(sc_readString)			(char *dest, unsigned int destLength, unsigned ch
 void			SC_API(sc_trace)				(const char *msg, int id, const char *file, unsigned int line);
 
 #ifdef _DEBUG
-	#define SC_ERROR(id)			((id) != SC_OK)
+	#define SC_ERROR(id)			((id) < SC_OK)
 	#define SC_ERRORMSG(msg, id)	sc_trace(msg, id, __FILE__, __LINE__)
 #else
 	#define SC_ERROR(id)			(id)

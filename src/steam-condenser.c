@@ -80,23 +80,23 @@ int SC_API(sc_openSocketAddrPort)(const char *address, const char *port, int soc
 		if (sock != -1) {
 			if (conn = connect(sock, server->ai_addr, server->ai_addrlen) != -1) {
 				#ifdef WIN32
-				DWORD timeout = 2000;
-				if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (const char*)&timeout, sizeof(long)*2) == -1) {
-					SC_ERRORMSG("Failed to set outgoing timeout", SC_SOCKOPT_FAILED);
-				}
-				if(setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(long)*2) == -1) {
-					SC_ERRORMSG("Failed to set incoming timeout", SC_SOCKOPT_FAILED);
-				}
+					DWORD timeout = 2000;
+					if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, (const char*)&timeout, sizeof(DWORD)) == -1) {
+						SC_ERRORMSG("Failed to set outgoing timeout", SC_SOCKOPT_FAILED);
+					}
+					if(setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, (const char*)&timeout, sizeof(DWORD)) == -1) {
+						SC_ERRORMSG("Failed to set incoming timeout", SC_SOCKOPT_FAILED);
+					}
 				#else
-				struct timeval timeout;
-				timeout.tv_sec = 2;
-				timeout.tv_usec = 0;
-				if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(long)*2) == -1) {
-					SC_ERRORMSG("Failed to set outgoing timeout", SC_SOCKOPT_FAILED);
-				}
-				if(setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(long)*2) == -1) {
-					SC_ERRORMSG("Failed to set incoming timeout", SC_SOCKOPT_FAILED);
-				}
+					struct timeval timeout;
+					timeout.tv_sec = 2;
+					timeout.tv_usec = 0;
+					if (setsockopt(sock, SOL_SOCKET, SO_SNDTIMEO, &timeout, sizeof(struct timeval)) == -1) {
+						SC_ERRORMSG("Failed to set outgoing timeout", SC_SOCKOPT_FAILED);
+					}
+					if(setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(struct timeval)) == -1) {
+						SC_ERRORMSG("Failed to set incoming timeout", SC_SOCKOPT_FAILED);
+					}
 				#endif
 				
 				break;
