@@ -62,7 +62,7 @@ typedef struct sc_ServerInfo {
 	byte secure;						// 0x01  - VAC Enabled
 	
 	union {
-		struct sc_SourceInfo {
+		struct {						// Source Servers
 			char gameVersion[32];		// Untested size, but come on.
 			short appID;
 			union {
@@ -83,7 +83,7 @@ typedef struct sc_ServerInfo {
 				};
 			};
 		};
-		struct sc_GoldSrcInfo {	
+		struct {						// GoldSrc Server
 			sc_ModInfo modInfo;			// Additional mod info (if isMod is set)
 			char gameIP[ADDRSTRLEN];
 			byte isMod;					// if 0x01, modData should be populated

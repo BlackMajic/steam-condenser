@@ -52,6 +52,9 @@ typedef char byte;
 	#ifndef NTDDI_VISTA
 		#define NTDDI_VISTA		0x06000000
 	#endif
+	#ifndef NTDDI_VERSION
+		#define NTDDI_VERSION	0
+	#endif
 	#if (NTDDI_VERSION < NTDDI_VISTA)
 		const char*	inet_ntop(int af, const void *src, char *dst, socklen_t cnt);
 		int			inet_pton(int af, const char *src, void *dst);
